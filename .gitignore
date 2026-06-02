@@ -28,8 +28,8 @@
 # local project data
 input/
 work/
-kb/
-reports/
+/kb/
+/reports/
 exports/
 private/
 real_data/
