@@ -43,3 +43,7 @@ addopts = "-q"
 [tool.setuptools.packages.find]
 where = ["cli"]
 include = ["bondlens*"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "docs", "examples"]
+skips = ["B110", "B608"]
