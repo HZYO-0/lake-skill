@@ -212,8 +212,8 @@ tests/
 ### 方式 1：ChatGPT 自定义 GPT（推荐，3 分钟）
 
 1. 打开 ChatGPT → Create a GPT
-2. 粘贴 `skill/SKILL.md` 到 Instructions
-3. 上传 `skill/references/frameworks/` 下的 7 个文件到 Knowledge
+2. 粘贴 `SKILL.md` 到 Instructions
+3. 上传 `references/frameworks/` 下的 7 个文件到 Knowledge
 4. 直接粘贴聊天记录开始使用
 
 ### 方式 2：Claude Code / Claude Project

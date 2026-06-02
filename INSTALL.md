@@ -1,11 +1,15 @@
 # 安装指南
 
-## 一句话安装（让 Agent 自己装）
+## 一行安装（推荐）
 
-把下面这句话粘贴给 Claude Code、Codex 或 OpenCode：
+在 Claude Code / Codex / OpenCode 中说：
 
-```
-请帮我安装 bondlens skill：从 https://github.com/HZYO-0/bondlens 克隆仓库，把 skill/ 目录下的 SKILL.md 和 references/frameworks/ 复制到对应平台的 skills 目录。
+> 帮我安装这个 skill：https://github.com/HZYO-0/bondlens
+
+或用 CLI 工具（支持 55+ runtime）：
+
+```bash
+npx skills add HZYO-0/bondlens
 ```
 
 ---
@@ -17,21 +21,21 @@
 ```bash
 # 项目内安装（推荐）
 mkdir -p .claude/skills/bondlens/references/frameworks
-cp skill/SKILL.md .claude/skills/bondlens/
-cp skill/references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
+cp SKILL.md .claude/skills/bondlens/
+cp references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
 
 # 或全局安装
 mkdir -p ~/.claude/skills/bondlens/references/frameworks
-cp skill/SKILL.md ~/.claude/skills/bondlens/
-cp skill/references/frameworks/*.md ~/.claude/skills/bondlens/references/frameworks/
+cp SKILL.md ~/.claude/skills/bondlens/
+cp references/frameworks/*.md ~/.claude/skills/bondlens/references/frameworks/
 ```
 
 ### Codex
 
 ```bash
 mkdir -p .codex/skills/bondlens/references/frameworks
-cp skill/SKILL.md .codex/skills/bondlens/
-cp skill/references/frameworks/*.md .codex/skills/bondlens/references/frameworks/
+cp SKILL.md .codex/skills/bondlens/
+cp references/frameworks/*.md .codex/skills/bondlens/references/frameworks/
 ```
 
 ### OpenCode
@@ -39,23 +43,23 @@ cp skill/references/frameworks/*.md .codex/skills/bondlens/references/frameworks
 ```bash
 # OpenCode 支持多个发现路径，任选其一
 mkdir -p .opencode/skills/bondlens/references/frameworks
-cp skill/SKILL.md .opencode/skills/bondlens/
-cp skill/references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
+cp SKILL.md .opencode/skills/bondlens/
+cp references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
 ```
 
 ### OpenClaw
 
 ```bash
 mkdir -p ~/.openclaw/workspace/skills/bondlens/references/frameworks
-cp skill/SKILL.md ~/.openclaw/workspace/skills/bondlens/
-cp skill/references/frameworks/*.md ~/.openclaw/workspace/skills/bondlens/references/frameworks/
+cp SKILL.md ~/.openclaw/workspace/skills/bondlens/
+cp references/frameworks/*.md ~/.openclaw/workspace/skills/bondlens/references/frameworks/
 ```
 
 ### ChatGPT Custom GPT
 
 1. 打开 ChatGPT → Create a GPT
-2. 把 `skill/SKILL.md` 全部内容粘贴到 **Instructions**
-3. 把 `skill/references/frameworks/` 下 7 个 `.md` 文件上传到 **Knowledge**
+2. 把 `SKILL.md` 全部内容粘贴到 **Instructions**
+3. 把 `references/frameworks/` 下 7 个 `.md` 文件上传到 **Knowledge**
 4. 开始对话
 
 ---

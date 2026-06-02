@@ -11,9 +11,9 @@
 
 1. 在当前项目根目录创建 .opencode/skills/bondlens/ 目录
 
-2. 把 skill/SKILL.md 复制到 .opencode/skills/bondlens/SKILL.md
+2. 把 SKILL.md 复制到 .opencode/skills/bondlens/SKILL.md
 
-3. 把 skill/references/frameworks/ 下的所有 .md 文件复制到 .opencode/skills/bondlens/references/frameworks/
+3. 把 references/frameworks/ 下的所有 .md 文件复制到 .opencode/skills/bondlens/references/frameworks/
 
 4. 完成后告诉我目录结构
 
@@ -28,8 +28,8 @@
 
 ```bash
 mkdir -p .opencode/skills/bondlens/references/frameworks
-cp skill/SKILL.md .opencode/skills/bondlens/
-cp skill/references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
+cp SKILL.md .opencode/skills/bondlens/
+cp references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
 ```
 
 ## 验证安装

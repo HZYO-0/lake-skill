@@ -17,7 +17,6 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SKILL_DIR = PROJECT_ROOT / "skill"
 DIST_DIR = PROJECT_ROOT / "dist"
 
 FRAMEWORKS = [
@@ -43,12 +42,12 @@ def package_chatgpt() -> None:
     out = DIST_DIR / "chatgpt"
     out.mkdir()
 
-    shutil.copy2(SKILL_DIR / "SKILL.md", out / "SKILL.md")
+    shutil.copy2(PROJECT_ROOT / "SKILL.md", out / "SKILL.md")
 
     fw_out = out / "frameworks"
     fw_out.mkdir()
     for fw in FRAMEWORKS:
-        src = SKILL_DIR / "references" / "frameworks" / fw
+        src = PROJECT_ROOT / "references" / "frameworks" / fw
         if src.exists():
             shutil.copy2(src, fw_out / fw)
 
@@ -71,16 +70,16 @@ def package_platform(platform: str, skill_subpath: str, install_hint: str) -> No
     out = DIST_DIR / platform / skill_subpath
     out.mkdir(parents=True)
 
-    shutil.copy2(SKILL_DIR / "SKILL.md", out / "SKILL.md")
+    shutil.copy2(PROJECT_ROOT / "SKILL.md", out / "SKILL.md")
 
     fw_out = out / "references" / "frameworks"
     fw_out.mkdir(parents=True)
     for fw in FRAMEWORKS:
-        src = SKILL_DIR / "references" / "frameworks" / fw
+        src = PROJECT_ROOT / "references" / "frameworks" / fw
         if src.exists():
             shutil.copy2(src, fw_out / fw)
 
-    kb_src = SKILL_DIR / "assets" / "kb_template"
+    kb_src = PROJECT_ROOT / "skill" / "assets" / "kb_template"
     if kb_src.exists():
         kb_out = out / "assets" / "kb_template"
         shutil.copytree(kb_src, kb_out)

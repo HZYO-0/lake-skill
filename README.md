@@ -1,25 +1,51 @@
 # BondLens 关系镜
 
-基于证据的亲密关系沟通分析 Skill/Agent。
+证据型聊天关系洞察 Skill。不是"他就是回避型"，而是"聊天记录呈现回避相关信号，置信度中等，替代解释包括……"。
 
-不是"他就是回避型"，而是"聊天记录呈现回避相关信号，置信度中等，替代解释包括……"。
+## 安装
 
-## 快速开始
+**一行安装（推荐）** — 在 Claude Code / Codex / OpenCode 中说：
 
-### 1. 创建 Skill/Agent
+> 帮我安装这个 skill：https://github.com/HZYO-0/bondlens
 
-在 ChatGPT、Claude、Codex 或其他支持 Skill/Agent 的平台创建一个新的 Skill/Agent。
+或用 CLI：
 
-### 2. 粘贴指令
+```bash
+npx skills add HZYO-0/bondlens
+```
 
-把 [`skill/SKILL.md`](skill/SKILL.md) 的全部内容复制粘贴到指令（Instructions）框中。
+<details>
+<summary>手动安装 / 其他平台</summary>
 
-### 3. 上传知识文件
+### ChatGPT
 
-把 [`skill/references/frameworks/`](skill/references/frameworks/) 目录下的 7 个 `.md` 文件上传为附加知识/上下文：
+1. 打开 ChatGPT → Create a GPT
+2. 把 [`SKILL.md`](SKILL.md) 全部内容粘贴到 **Instructions**
+3. 把 [`references/frameworks/`](references/frameworks/) 下 7 个 `.md` 文件上传到 **Knowledge**
+
+### Claude Code / Codex / OpenCode
+
+```bash
+# 自动安装（在项目目录下运行）
+mkdir -p .claude/skills/bondlens/references/frameworks
+cp SKILL.md .claude/skills/bondlens/
+cp references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
+```
+
+详细安装指南见 [`INSTALL.md`](INSTALL.md)。
+
+</details>
+
+## 使用
+
+安装后在对话中说：
+
+> 帮我分析一下我们的聊天记录
+
+然后粘贴或上传聊天记录。首次分析需要足量、有代表性的数据。
 
 ```
-skill/references/frameworks/
+references/frameworks/
 ├── evidence_ladder.md                    # 证据等级定义
 ├── big_five_communication_signals.md     # 大五人格沟通信号
 ├── attachment_anxiety_avoidance.md       # 依恋焦虑/回避信号
@@ -146,23 +172,23 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 ## 项目结构
 
 ```
-├── cli/                          # Python CLI（可选，隐私增强）
-│   └── bondlens/
-│       ├── cli.py                # 命令行入口
-│       ├── schema.py             # 数据模型
-│       ├── adapters/             # 输入格式适配器
-│       ├── privacy/              # 隐私脱敏
-│       ├── segmentation/         # 会话切分
-│       ├── evidence/             # 证据索引
-│       ├── kb/                   # 知识库管理
-│       └── reports/              # 报告生成
-├── skill/                        # Skill/Agent 定义
-│   ├── SKILL.md                  # 指令（粘贴到 Instructions）
-│   ├── references/frameworks/    # 分析框架（上传为知识）
-│   └── assets/kb_template/       # 知识库模板
-├── tests/                        # 测试
-├── examples/                     # 合成示例数据
-└── docs/                         # 文档
+├── SKILL.md                        # Skill 指令（根目录，兼容 AgentSkills 协议）
+├── references/frameworks/          # 分析框架（7 个）
+├── cli/bondlens/                   # Python CLI（可选，隐私增强）
+│   ├── cli.py                      # 命令行入口
+│   ├── schema.py                   # 数据模型
+│   ├── adapters/                   # 输入格式适配器
+│   ├── privacy/                    # 隐私脱敏
+│   ├── segmentation/               # 会话切分
+│   ├── evidence/                   # 证据索引
+│   ├── kb/                         # 知识库管理
+│   └── reports/                    # 报告生成
+├── skill/                          # 补充资源
+│   ├── assets/kb_template/         # 知识库模板
+│   └── agents/                     # Agent 配置
+├── tests/                          # 测试
+├── examples/                       # 合成示例数据
+└── docs/                           # 文档
 ```
 
 ## 验证
