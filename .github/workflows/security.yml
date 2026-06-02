@@ -1,0 +1,35 @@
+name: Security
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+
+    - name: Run bandit security linter
+      run: bandit -r cli/ -c pyproject.toml
+
+    - name: Run pip-audit
+      run: pip-audit
+
+    - name: Check for forbidden network calls
+      run: python tools/check_no_forbidden_network_calls.py cli skill

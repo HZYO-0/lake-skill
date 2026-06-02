@@ -1,0 +1,25 @@
+name: Package Skill
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create dist directory
+      run: mkdir -p dist
+
+    - name: Package skill
+      run: cd skill && zip -r ../dist/skill.zip . -x "*.pyc" -x "__pycache__/*"
+
+    - name: Upload skill artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: skill.zip
+        path: dist/skill.zip

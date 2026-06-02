@@ -1,0 +1,102 @@
+project:
+  name: bondlens
+  default_relationship_type: ambiguous
+  timezone: Asia/Shanghai
+
+deployment:
+  default_mode: hybrid_chatgpt_skill
+  description: local preprocessing + ChatGPT Skill analysis
+
+privacy:
+  default_privacy_mode: cloud-safe
+  raw_upload_allowed: false
+  upload_policy: digest_and_evidence_only
+  recommended_chatgpt_settings:
+    turn_off_model_training: true
+    use_temporary_chat_for_sensitive_analysis: true
+    avoid_memory_for_sensitive_relationship_data: true
+
+input:
+  supported_sources:
+    - readable_wechat_sqlite
+    - csv
+    - tsv
+    - txt
+    - markdown
+    - html
+    - json
+    - jsonl
+    - voice_transcript
+    - ocr_transcript
+    - subtitle
+  default_ingestion_output: normalized_messages.jsonl
+
+sqlite:
+  allow_encrypted_database: false
+  allow_key_extraction: false
+  inspect_sample_rows: 5
+  require_schema_map_for_low_confidence: true
+
+redaction:
+  modes:
+    local_raw:
+      enabled: true
+      warning_required: true
+    local_safe:
+      redact_high_risk_identifiers: true
+    cloud_safe:
+      redact_names: true
+      redact_orgs: true
+      redact_locations: true
+      redact_contact_info: true
+      coarsen_time: true
+    publish_safe:
+      require_synthetic_data: true
+
+segmentation:
+  default_time_gap_hours: 6
+  long_gap_hours: 24
+  detect_episode_types:
+    - ambiguous
+    - reassurance
+    - relationship_pressure
+    - conflict
+    - repair
+    - coldness
+    - reconnection
+    - breakup
+    - boundary
+
+analysis:
+  evidence_required: true
+  minimum_evidence_for_medium_confidence: 3
+  require_counterevidence: true
+  require_alternative_explanations: true
+  allow_clinical_diagnosis: false
+  allow_personality_disorder_labels: false
+  allow_manipulation_tactics: false
+  allow_symbolic_astrology_tarot: false
+
+symbolic_mode:
+  enabled_by_default: false
+  may_be_enabled_by_user: true
+  label_required: symbolic reflection only
+  can_affect_core_analysis: false
+  can_affect_evidence_score: false
+
+evidence:
+  quote_max_chars: 280
+  low_asr_confidence_threshold: 0.75
+  low_ocr_confidence_threshold: 0.80
+  high_confidence_requires_counterevidence_review: true
+
+output:
+  default_language: zh-CN
+  reports:
+    - profile_report.md
+    - personality_signals.md
+    - attachment_hypotheses.md
+    - interaction_patterns.md
+    - communication_playbook.md
+    - reply_drafts.md
+    - kb_patch.md

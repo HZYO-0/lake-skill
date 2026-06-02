@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  bondlens:
+    build: .
+    volumes:
+      - ./input:/app/input
+      - ./work:/app/work
+      - ./kb:/app/kb
+      - ./reports:/app/reports
+      - ./examples:/app/examples
+    command: ["--help"]
