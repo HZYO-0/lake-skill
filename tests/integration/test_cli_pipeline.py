@@ -27,7 +27,8 @@ def _check_cli_deps() -> None:
 
 def _run(cmd: list[str], work_dir: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(PROJECT_ROOT)
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = f"{PROJECT_ROOT}{os.pathsep}{existing}" if existing else str(PROJECT_ROOT)
     return subprocess.run(
         cmd, cwd=str(PROJECT_ROOT), capture_output=True, text=True, timeout=30, env=env
     )
