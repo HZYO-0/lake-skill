@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from cli.bondlens.privacy.leak_checker import check_for_leaks
+from bondlens.privacy.leak_checker import check_for_leaks
 
 
 def test_no_real_data_in_fixtures():

@@ -42,7 +42,7 @@ def test_full_pipeline() -> None:
 
         # ingest
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "ingest", "-f", str(SYNTHETIC_CSV), "-t", "csv",
              "--self-name", "我", "--target-name", "张三",
              "-o", str(work / "raw.jsonl")],
@@ -53,7 +53,7 @@ def test_full_pipeline() -> None:
 
         # redact
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "redact", "-f", str(work / "raw.jsonl"),
              "-o", str(work / "redacted.jsonl")],
             work,
@@ -63,7 +63,7 @@ def test_full_pipeline() -> None:
 
         # segment
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "segment", "-f", str(work / "redacted.jsonl"),
              "-o", str(work / "sessions.jsonl")],
             work,
@@ -73,7 +73,7 @@ def test_full_pipeline() -> None:
 
         # digest
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "digest", "-m", str(work / "redacted.jsonl"),
              "-s", str(work / "sessions.jsonl"),
              "-o", str(work / "digest.md")],
@@ -84,7 +84,7 @@ def test_full_pipeline() -> None:
 
         # evidence
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "evidence", "-m", str(work / "redacted.jsonl"),
              "-s", str(work / "sessions.jsonl"),
              "-o", str(work / "evidence.jsonl")],
@@ -95,7 +95,7 @@ def test_full_pipeline() -> None:
 
         # export (conversations mode)
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "export", "-m", str(work / "redacted.jsonl"),
              "-s", str(work / "sessions.jsonl"),
              "-o", str(work / "conversations.jsonl"),
@@ -114,17 +114,17 @@ def test_jsonl_outputs_are_valid() -> None:
         work.mkdir()
 
         steps = [
-            ([sys.executable, "-m", "cli.bondlens.cli",
+            ([sys.executable, "-m", "bondlens.cli",
               "ingest", "-f", str(SYNTHETIC_CSV), "-t", "csv",
               "--self-name", "我", "--target-name", "张三",
               "-o", str(work / "raw.jsonl")], "ingest"),
-            ([sys.executable, "-m", "cli.bondlens.cli",
+            ([sys.executable, "-m", "bondlens.cli",
               "redact", "-f", str(work / "raw.jsonl"),
               "-o", str(work / "redacted.jsonl")], "redact"),
-            ([sys.executable, "-m", "cli.bondlens.cli",
+            ([sys.executable, "-m", "bondlens.cli",
               "segment", "-f", str(work / "redacted.jsonl"),
               "-o", str(work / "sessions.jsonl")], "segment"),
-            ([sys.executable, "-m", "cli.bondlens.cli",
+            ([sys.executable, "-m", "bondlens.cli",
               "evidence", "-m", str(work / "redacted.jsonl"),
               "-s", str(work / "sessions.jsonl"),
               "-o", str(work / "evidence.jsonl")], "evidence"),
@@ -152,14 +152,14 @@ def test_digest_contains_sections() -> None:
         work.mkdir()
 
         for cmd in [
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "ingest", "-f", str(SYNTHETIC_CSV), "-t", "csv",
              "--self-name", "我", "--target-name", "张三",
              "-o", str(work / "raw.jsonl")],
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "redact", "-f", str(work / "raw.jsonl"),
              "-o", str(work / "redacted.jsonl")],
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "segment", "-f", str(work / "redacted.jsonl"),
              "-o", str(work / "sessions.jsonl")],
         ]:
@@ -167,7 +167,7 @@ def test_digest_contains_sections() -> None:
             assert r.returncode == 0, r.stderr
 
         r = _run(
-            [sys.executable, "-m", "cli.bondlens.cli",
+            [sys.executable, "-m", "bondlens.cli",
              "digest", "-m", str(work / "redacted.jsonl"),
              "-s", str(work / "sessions.jsonl"),
              "-o", str(work / "digest.md")],

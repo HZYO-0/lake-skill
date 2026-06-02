@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
-from cli.bondlens.schema import Message, Session, SenderRole, MessageType, Modality
-from cli.bondlens.evidence.indexer import index_evidence, detect_themes
+from bondlens.schema import Message, Session, SenderRole, MessageType, Modality
+from bondlens.evidence.indexer import index_evidence, detect_themes
 
 
 def create_test_messages():
