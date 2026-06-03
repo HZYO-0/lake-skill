@@ -1,0 +1,11 @@
+project_name: relationship_kb
+relationship_type: ambiguous
+privacy_mode: cloud-safe
+created_at: null
+last_updated_at: null
+source_apps: []
+source_types: []
+analysis_policy:
+  clinical_diagnosis: false
+  manipulation_tactics: false
+  evidence_required: true
