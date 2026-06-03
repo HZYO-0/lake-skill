@@ -351,6 +351,105 @@ def _generate_unresolved_questions(
     return questions
 
 
+def load_kb(kb_dir: str) -> KnowledgeBase:
+    """Load existing knowledge base from directory.
+
+    Args:
+        kb_dir: Path to knowledge base directory
+
+    Returns:
+        Loaded knowledge base
+    """
+    import yaml
+
+    kb_path = Path(kb_dir)
+    if not kb_path.exists():
+        raise FileNotFoundError(f"KB directory not found: {kb_path}")
+
+    # Load metadata
+    metadata_path = kb_path / "metadata.yaml"
+    if metadata_path.exists():
+        metadata_dict = yaml.safe_load(metadata_path.read_text(encoding="utf-8"))
+        metadata = KBMetadata(**metadata_dict)
+    else:
+        metadata = KBMetadata()
+
+    # Load profile
+    profile_path = kb_path / "target_profile.md"
+    if profile_path.exists():
+        profile = _parse_profile(profile_path.read_text(encoding="utf-8"))
+    else:
+        profile = KBProfile()
+
+    # Load observations
+    observations: list[KBObservation] = []
+    obs_path = kb_path / "observations.jsonl"
+    if obs_path.exists():
+        for line in obs_path.read_text(encoding="utf-8").strip().split("\n"):
+            if line.strip():
+                observations.append(KBObservation.model_validate_json(line))
+
+    # Load unresolved questions
+    questions_path = kb_path / "unresolved_questions.md"
+    unresolved_questions: list[str] = []
+    if questions_path.exists():
+        for line in questions_path.read_text(encoding="utf-8").split("\n"):
+            line = line.strip()
+            if line.startswith("- "):
+                unresolved_questions.append(line[2:])
+
+    return KnowledgeBase(
+        metadata=metadata,
+        profile=profile,
+        observations=observations,
+        unresolved_questions=unresolved_questions,
+    )
+
+
+def _parse_profile(content: str) -> KBProfile:
+    """Parse profile from markdown content.
+
+    Args:
+        content: Markdown content
+
+    Returns:
+        KBProfile object
+    """
+    lines = content.split("\n")
+    relationship_type = "ambiguous"
+    communication_style = None
+    emotional_patterns: list[str] = []
+    attachment_signals: list[str] = []
+    notes: list[str] = []
+
+    current_section = None
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("## "):
+            current_section = line[3:].strip()
+        elif line.startswith("- ") and current_section:
+            item = line[2:].strip()
+            if current_section == "Emotional Patterns":
+                emotional_patterns.append(item)
+            elif current_section == "Attachment Signals":
+                attachment_signals.append(item)
+            elif current_section == "Notes":
+                notes.append(item)
+        elif current_section == "Relationship Type" and line:
+            relationship_type = line
+        elif current_section == "Communication Style" and line and line != "Not determined":
+            communication_style = line
+
+    return KBProfile(
+        relationship_type=relationship_type,
+        communication_style=communication_style,
+        emotional_patterns=emotional_patterns,
+        attachment_signals=attachment_signals,
+        notes=notes,
+    )
+
+
 def _save_kb_files(kb: KnowledgeBase, output_dir: str) -> None:
     """Save knowledge base to files.
 

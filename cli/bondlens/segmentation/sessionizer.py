@@ -16,7 +16,7 @@ def segment_sessions(
     Args:
         messages: List of messages (must be sorted by timestamp)
         time_gap_hours: Time gap threshold for session split (hours)
-        long_gap_hours: Long gap threshold for session split (hours)
+        long_gap_hours: Long gap threshold for marking sessions after long pauses
 
     Returns:
         List of sessions
@@ -28,6 +28,7 @@ def segment_sessions(
     current_session_messages: list[Message] = []
     session_start: Optional[datetime] = None
     session_count = 0
+    last_session_end: Optional[datetime] = None
 
     for i, msg in enumerate(messages):
         # First message
@@ -47,11 +48,14 @@ def segment_sessions(
                 current_session_messages,
                 session_count + 1,
                 session_start,
+                last_session_end,
+                long_gap_hours,
             )
             sessions.append(session)
 
             # Start new session
             session_count += 1
+            last_session_end = current_session_messages[-1].timestamp
             current_session_messages = [msg]
             session_start = msg.timestamp
         else:
@@ -63,6 +67,8 @@ def segment_sessions(
             current_session_messages,
             session_count + 1,
             session_start,
+            last_session_end,
+            long_gap_hours,
         )
         sessions.append(session)
 
@@ -73,6 +79,8 @@ def _create_session(
     messages: list[Message],
     session_num: int,
     start_time: Optional[datetime],
+    last_session_end: Optional[datetime] = None,
+    long_gap_hours: float = 24.0,
 ) -> Session:
     """Create a session from messages.
 
@@ -80,6 +88,8 @@ def _create_session(
         messages: List of messages
         session_num: Session number
         start_time: Session start time
+        last_session_end: End time of previous session (for gap detection)
+        long_gap_hours: Long gap threshold for marking sessions after long pauses
 
     Returns:
         Session object
@@ -104,6 +114,13 @@ def _create_session(
     # Get message IDs
     message_ids = [m.message_id for m in messages]
 
+    # Detect long gap from previous session
+    episode_type: list[str] = []
+    if last_session_end is not None:
+        gap = (start - last_session_end).total_seconds() / 3600
+        if gap >= long_gap_hours:
+            episode_type.append("long_pause")
+
     return Session(
         session_id=session_id,
         conversation_id=conversation_id,
@@ -113,6 +130,7 @@ def _create_session(
         self_count=self_count,
         target_count=target_count,
         message_ids=message_ids,
+        episode_type=episode_type,
     )
 
 

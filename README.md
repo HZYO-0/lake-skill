@@ -81,16 +81,20 @@ See [`docs/chat_record_preparation.md`](docs/chat_record_preparation.md) for wha
 
 ## What It Produces
 
-BondLens can produce:
+BondLens produces an 8-layer relationship analysis report:
 
-1. Relationship portrait
-2. Non-clinical personality communication signals
-3. Attachment anxiety/avoidance hypotheses
-4. Interaction pattern analysis
-5. Communication playbook
-6. Message drafts in multiple tones
-7. Knowledge base files or update patches
-8. Uncertainty and safety notes
+| Layer | Content |
+|-------|---------|
+| Layer 0 | Core interaction rules (when TA approaches, withdraws, conflicts, repairs) |
+| Layer 1 | Relationship background and key patterns |
+| Layer 2 | Target's expression DNA (catchphrases, rhythm, emotional expressions) |
+| Layer 3 | Your expression DNA (same structure) |
+| Layer 4 | Interaction patterns (positive/negative loops, conflict escalation, repair signals) |
+| Layer 5 | Attachment signals (anxiety/avoidance/secure for both parties) |
+| Layer 6 | Communication coaching + multi-tone message drafts |
+| Layer 7 | Uncertainty notes (confidence, counterevidence, alternative explanations) |
+
+Every major conclusion cites evidence IDs, confidence levels, and alternative explanations.
 
 When data is insufficient, BondLens asks a short calibration question set first. If the user wants to skip, it proceeds with explicitly low-confidence observations.
 
@@ -135,6 +139,7 @@ bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions
 bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
 bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
 bondlens kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
+bondlens kb patch --kb kb/ --evidence work/evidence.redacted.jsonl --out work/patch.json
 ```
 
 Upload these generated files to your Skill/Agent:
@@ -160,10 +165,11 @@ BondLens refuses or redirects requests for:
 ```text
 .
 ├── skills/bondlens/              # Installable Skill package for GitHub/AgentSkills
-│   ├── SKILL.md                  # Canonical Skill instruction
+│   ├── SKILL.md                  # Canonical Skill instruction (v2, 5-step workflow)
 │   ├── references/frameworks/    # Evidence, attachment, personality, safety, and coaching frameworks
 │   ├── assets/kb_template/       # Relationship knowledge-base templates
 │   └── agents/openai.yaml        # UI metadata for compatible skill runtimes
+├── skill/prompts/                # Structured analysis prompts (intake, analyzers, report, merge, correction)
 ├── cli/bondlens/                 # Optional Python CLI for local preprocessing
 ├── docs/                         # Installation, privacy, platform, and data-preparation guides
 ├── examples/                     # Synthetic inputs and output-structure checks

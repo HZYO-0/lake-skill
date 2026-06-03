@@ -153,3 +153,46 @@ def test_digest_contains_sections(cli_runner: tuple, tmp_path: Path) -> None:
     digest = (work / "digest.md").read_text(encoding="utf-8")
     assert "消息" in digest or "message" in digest.lower()
     assert "会话" in digest or "session" in digest.lower()
+
+
+def test_kb_patch_loads_existing_kb(cli_runner: tuple, tmp_path: Path) -> None:
+    """kb_patch correctly loads existing KB instead of creating fresh one."""
+    _check_cli_deps()
+    runner, app = cli_runner
+    work = tmp_path / "work"
+    work.mkdir()
+
+    # Run pipeline to get evidence
+    for args in [
+        ["ingest", "-f", str(SYNTHETIC_CSV), "-t", "csv",
+         "--self-name", "我", "--target-name", "张三",
+         "-o", str(work / "raw.jsonl")],
+        ["redact", "-f", str(work / "raw.jsonl"),
+         "-o", str(work / "redacted.jsonl")],
+        ["segment", "-f", str(work / "redacted.jsonl"),
+         "-o", str(work / "sessions.jsonl")],
+        ["evidence", "-m", str(work / "redacted.jsonl"),
+         "-s", str(work / "sessions.jsonl"),
+         "-o", str(work / "evidence.jsonl")],
+    ]:
+        r = runner.invoke(app, args)
+        assert r.exit_code == 0, r.output
+
+    # Initialize KB
+    r = runner.invoke(app, [
+        "kb", "init", "-m", str(work / "redacted.jsonl"),
+        "-s", str(work / "sessions.jsonl"),
+        "-e", str(work / "evidence.jsonl"),
+        "-o", str(work / "kb"),
+    ])
+    assert r.exit_code == 0, f"kb init failed: {r.output}"
+    assert (work / "kb" / "metadata.yaml").exists()
+
+    # Run kb patch - should load existing KB, not create fresh
+    r = runner.invoke(app, [
+        "kb", "patch", "--kb", str(work / "kb"),
+        "-e", str(work / "evidence.jsonl"),
+        "-o", str(work / "patch.json"),
+    ])
+    assert r.exit_code == 0, f"kb patch failed: {r.output}"
+    assert (work / "patch.json").exists()

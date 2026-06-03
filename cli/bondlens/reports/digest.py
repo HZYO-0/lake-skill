@@ -235,6 +235,16 @@ def generate_digest(
 
     lines.append("")
 
+    # Add key quotes
+    key_quotes = extract_key_quotes(messages)
+    if key_quotes:
+        lines.append("## Key Quotes")
+        lines.append("")
+        for quote in key_quotes:
+            speaker_label = "Self" if quote["speaker"] == "self" else "Target"
+            lines.append(f"- **[{speaker_label}]** {quote['text']}")
+        lines.append("")
+
     # Add notes
     lines.append("## Notes")
     lines.append("")

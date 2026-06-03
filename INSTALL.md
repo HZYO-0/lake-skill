@@ -45,6 +45,7 @@ Restart Codex after installing.
 1. Create a GPT.
 2. Paste `skills/bondlens/SKILL.md` into **Instructions**.
 3. Upload all 7 files from `skills/bondlens/references/frameworks/` to **Knowledge**.
+4. The skill also uses structured prompts from `skill/prompts/` (10 files) for its 5-step analysis workflow.
 4. Start with representative chat records.
 
 ## Manual Install Paths

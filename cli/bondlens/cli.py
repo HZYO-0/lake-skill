@@ -443,7 +443,6 @@ def kb_patch(
     from .jsonl_utils import read_jsonl
     from .schema import Evidence
     from .kb.patch import create_kb_patch, save_kb_patch
-    from .kb.schema import KnowledgeBase, KBMetadata, KBProfile
 
     kb_path = Path(kb_dir)
     evidence_path = Path(evidence_file)
@@ -457,11 +456,9 @@ def kb_patch(
         rprint(f"[red]Error: Evidence file not found: {evidence_path}[/red]")
         raise typer.Exit(1)
 
-    # Load existing KB (simplified - in real implementation would load from files)
-    kb = KnowledgeBase(
-        metadata=KBMetadata(),
-        profile=KBProfile(),
-    )
+    # Load existing KB from directory
+    from .kb.init import load_kb
+    kb = load_kb(str(kb_path))
 
     # Read new evidence
     rprint(f"[blue]Reading new evidence from {evidence_path}...[/blue]")
