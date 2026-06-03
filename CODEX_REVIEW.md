@@ -199,8 +199,8 @@ tests/
 
 - 全部 26 个测试通过（23 unit/safety + 3 integration）
 - Integration test 覆盖完整 pipeline：ingest → redact → segment → digest → evidence → export
-- 隐私扫描：cli/ 和 skill/ 源码无真实隐私数据泄露
-- 网络调用扫描：cli/ 和 skill/ 无禁止的网络调用
+- 隐私扫描：cli/ 和 skills/ 源码无真实隐私数据泄露
+- 网络调用扫描：cli/ 和 skills/ 无禁止的网络调用
 - 无解密行为
 
 ---
