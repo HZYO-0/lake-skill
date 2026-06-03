@@ -13,7 +13,7 @@ BondLens does **not** tell you "TA is definitely avoidant." It says: "these mess
 - **Non-clinical**: personality and attachment outputs are communication hypotheses, not diagnoses.
 - **Privacy-aware**: paste directly for convenience, or use the CLI to redact and summarize locally before upload.
 - **Coaching mode**: turns analysis into safer message drafts and next-step communication options.
-- **Portable Skill**: one canonical `SKILL.md`, packaged for multiple agent runtimes.
+- **Portable Skill**: one canonical installable package in `skills/bondlens/`, packaged for multiple agent runtimes.
 
 ## Install
 
@@ -22,20 +22,28 @@ BondLens does **not** tell you "TA is definitely avoidant." It says: "these mess
 In Claude Code, Codex, OpenCode, or another compatible agent, ask:
 
 ```text
-帮我安装这个 skill：https://github.com/HZYO-0/bondlens
+帮我安装这个 skill：https://github.com/HZYO-0/bondlens/tree/main/skills/bondlens
 ```
 
 If your runtime supports AgentSkills:
 
 ```bash
-npx skills add HZYO-0/bondlens
+npx skills add HZYO-0/bondlens -y
+```
+
+For Codex's built-in skill installer:
+
+```bash
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo HZYO-0/bondlens \
+  --path skills/bondlens
 ```
 
 ### ChatGPT Custom GPT
 
 1. Create a GPT.
-2. Paste [`SKILL.md`](SKILL.md) into **Instructions**.
-3. Upload the 7 files in [`references/frameworks/`](references/frameworks/) to **Knowledge**.
+2. Paste [`skills/bondlens/SKILL.md`](skills/bondlens/SKILL.md) into **Instructions**.
+3. Upload the 7 files in [`skills/bondlens/references/frameworks/`](skills/bondlens/references/frameworks/) to **Knowledge**.
 4. Start with a representative chat record sample.
 
 Manual platform paths and verification steps are in [`INSTALL.md`](INSTALL.md).
@@ -151,8 +159,11 @@ BondLens refuses or redirects requests for:
 
 ```text
 .
-├── SKILL.md                      # Canonical Skill instruction
-├── references/frameworks/        # Evidence, attachment, personality, safety, and coaching frameworks
+├── skills/bondlens/              # Installable Skill package for GitHub/AgentSkills
+│   ├── SKILL.md                  # Canonical Skill instruction
+│   ├── references/frameworks/    # Evidence, attachment, personality, safety, and coaching frameworks
+│   ├── assets/kb_template/       # Relationship knowledge-base templates
+│   └── agents/openai.yaml        # UI metadata for compatible skill runtimes
 ├── cli/bondlens/                 # Optional Python CLI for local preprocessing
 ├── docs/                         # Installation, privacy, platform, and data-preparation guides
 ├── examples/                     # Synthetic inputs and output-structure checks

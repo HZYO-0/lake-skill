@@ -1,4 +1,4 @@
-"""Check that CLI/skill code doesn't contain forbidden network calls."""
+"""Check that CLI and skill package files don't contain forbidden network calls."""
 
 import re
 import sys

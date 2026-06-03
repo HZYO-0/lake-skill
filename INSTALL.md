@@ -1,97 +1,86 @@
-# 安装指南
+# Installation
 
-## 一行安装（推荐）
+BondLens has one clean installable Skill package:
 
-在 Claude Code / Codex / OpenCode 中说：
+```text
+skills/bondlens/
+```
 
-> 帮我安装这个 skill：https://github.com/HZYO-0/bondlens
+The repository root is the development project. Use `skills/bondlens/` when installing the Skill.
 
-或用 CLI 工具（支持 55+ runtime）：
+## AgentSkills CLI
+
+For Claude Code, Codex, OpenCode, OpenClaw, and other compatible runtimes:
 
 ```bash
-npx skills add HZYO-0/bondlens
+npx skills add HZYO-0/bondlens -y
 ```
 
----
-
-## 手动安装
-
-### Claude Code
+To list detected skills first:
 
 ```bash
-# 项目内安装（推荐）
-mkdir -p .claude/skills/bondlens/references/frameworks
-cp SKILL.md .claude/skills/bondlens/
-cp references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
-
-# 或全局安装
-mkdir -p ~/.claude/skills/bondlens/references/frameworks
-cp SKILL.md ~/.claude/skills/bondlens/
-cp references/frameworks/*.md ~/.claude/skills/bondlens/references/frameworks/
+npx skills add HZYO-0/bondlens --list
 ```
 
-### Codex
+## Codex Built-In Installer
 
 ```bash
-mkdir -p .codex/skills/bondlens/references/frameworks
-cp SKILL.md .codex/skills/bondlens/
-cp references/frameworks/*.md .codex/skills/bondlens/references/frameworks/
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo HZYO-0/bondlens \
+  --path skills/bondlens
 ```
 
-### OpenCode
+On Windows, the script path is usually:
+
+```powershell
+python C:\Users\<you>\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py `
+  --repo HZYO-0/bondlens `
+  --path skills/bondlens
+```
+
+Restart Codex after installing.
+
+## ChatGPT Custom GPT
+
+1. Create a GPT.
+2. Paste `skills/bondlens/SKILL.md` into **Instructions**.
+3. Upload all 7 files from `skills/bondlens/references/frameworks/` to **Knowledge**.
+4. Start with representative chat records.
+
+## Manual Install Paths
+
+Copy the contents of `skills/bondlens/` into the relevant runtime path:
+
+| Platform | Destination |
+|---|---|
+| Claude Code project | `.claude/skills/bondlens/` |
+| Claude Code global | `~/.claude/skills/bondlens/` |
+| Codex project | `.codex/skills/bondlens/` |
+| OpenCode project | `.opencode/skills/bondlens/` |
+| OpenClaw global | `~/.openclaw/workspace/skills/bondlens/` |
+| Agents project | `.agents/skills/bondlens/` |
+
+Example:
 
 ```bash
-# OpenCode 支持多个发现路径，任选其一
-mkdir -p .opencode/skills/bondlens/references/frameworks
-cp SKILL.md .opencode/skills/bondlens/
-cp references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
+mkdir -p .codex/skills
+cp -r skills/bondlens .codex/skills/bondlens
 ```
 
-### OpenClaw
+## Verify
 
-```bash
-mkdir -p ~/.openclaw/workspace/skills/bondlens/references/frameworks
-cp SKILL.md ~/.openclaw/workspace/skills/bondlens/
-cp references/frameworks/*.md ~/.openclaw/workspace/skills/bondlens/references/frameworks/
-```
+After installation, start a new agent session and say:
 
-### ChatGPT Custom GPT
-
-1. 打开 ChatGPT → Create a GPT
-2. 把 `SKILL.md` 全部内容粘贴到 **Instructions**
-3. 把 `references/frameworks/` 下 7 个 `.md` 文件上传到 **Knowledge**
-4. 开始对话
-
----
-
-## 验证安装
-
-安装后在对话中说：
-
-```
+```text
 帮我分析一下我们的聊天记录
 ```
 
-如果 Skill 回复"为了让分析更准，我需要先确认几件事"，说明安装成功。
+If BondLens asks for relationship context, analysis goals, data format, time span, or background, the Skill is active.
 
----
+## CLI Dependencies
 
-## 依赖（仅 CLI 预处理需要）
+The Python CLI is optional and only needed for local preprocessing:
 
 ```bash
 pip install -e ".[dev]"
 ```
-
-CLI 是可选的，只在隐私敏感场景下需要。直接使用 Skill 不需要安装任何依赖。
-
----
-
-## 平台路径汇总
-
-| 平台 | 项目内路径 | 全局路径 |
-|------|-----------|---------|
-| Claude Code | `.claude/skills/bondlens/` | `~/.claude/skills/bondlens/` |
-| Codex | `.codex/skills/bondlens/` | — |
-| OpenCode | `.opencode/skills/bondlens/` | — |
-| OpenClaw | — | `~/.openclaw/workspace/skills/bondlens/` |
-| ChatGPT | 粘贴到 Instructions + 上传 Knowledge | — |

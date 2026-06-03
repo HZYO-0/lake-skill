@@ -32,4 +32,4 @@ jobs:
       run: pip-audit
 
     - name: Check for forbidden network calls
-      run: python tools/check_no_forbidden_network_calls.py cli skill
+      run: python tools/check_no_forbidden_network_calls.py cli skills

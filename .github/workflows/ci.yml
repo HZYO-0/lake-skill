@@ -37,4 +37,4 @@ jobs:
       run: pytest -q
 
     - name: Check for privacy leaks
-      run: python tools/check_no_real_private_data.py cli skill
+      run: python tools/check_no_real_private_data.py cli skills

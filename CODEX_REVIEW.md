@@ -22,7 +22,7 @@
 
 **模式 1：直接使用 Skill（推荐，3 分钟部署）**
 ```
-用户 → 创建 ChatGPT/Claude GPT/Project → 粘贴 SKILL.md → 上传框架文件 → 粘贴聊天记录 → 获得分析
+用户 → 安装 skills/bondlens 或创建 ChatGPT GPT → 粘贴 SKILL.md/上传框架文件 → 粘贴聊天记录 → 获得分析
 ```
 
 **模式 2：CLI 预处理 + Skill 分析（增强隐私）**
@@ -212,18 +212,26 @@ tests/
 ### 方式 1：ChatGPT 自定义 GPT（推荐，3 分钟）
 
 1. 打开 ChatGPT → Create a GPT
-2. 粘贴 `SKILL.md` 到 Instructions
-3. 上传 `references/frameworks/` 下的 7 个文件到 Knowledge
+2. 粘贴 `skills/bondlens/SKILL.md` 到 Instructions
+3. 上传 `skills/bondlens/references/frameworks/` 下的 7 个文件到 Knowledge
 4. 直接粘贴聊天记录开始使用
 
 ### 方式 2：Claude Code / Claude Project
 
-- **Claude Project**：粘贴 SKILL.md 到 Instructions，上传框架文件到 Knowledge
-- **Claude Code**：复制到 `.claude/skills/bondlens/`
+- **Claude Project**：粘贴 `skills/bondlens/SKILL.md` 到 Instructions，上传框架文件到 Knowledge
+- **Claude Code**：用 `npx skills add HZYO-0/bondlens -y`，或复制 `skills/bondlens/` 到 `.claude/skills/bondlens/`
 
 ### 方式 3：Codex / OpenCode
 
-复制到 `.codex/skills/bondlens/` 或 `.opencode/skills/bondlens/`。
+Codex 可用内置安装器安装 GitHub 子目录：
+
+```bash
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo HZYO-0/bondlens \
+  --path skills/bondlens
+```
+
+OpenCode 可复制 `skills/bondlens/` 到 `.opencode/skills/bondlens/`。
 
 ### 方式 4：CLI 本地预处理 + Skill（增强隐私）
 
@@ -277,8 +285,8 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 
 ### CI 安全扫描
 
-- **隐私扫描** (`tools/check_no_real_private_data.py`)：扫描 cli/ 和 skill/ 源码中的手机号、身份证、邮箱、银行卡、微信号等 PII 模式。tests/ 和 docs/ 中的示例数据被排除。
-- **网络调用扫描** (`tools/check_no_forbidden_network_calls.py`)：扫描 cli/ 和 skill/ 中的 requests/urllib/httpx/aiohttp/socket 调用，确保本地预处理工具不外发数据。
+- **隐私扫描** (`tools/check_no_real_private_data.py`)：扫描 cli/、skills/ 源码和 Skill 包中的手机号、身份证、邮箱、银行卡、微信号等 PII 模式。tests/ 和 docs/ 使用更宽的安全示例 allowlist。
+- **网络调用扫描** (`tools/check_no_forbidden_network_calls.py`)：扫描 cli/、skills/ 中的 requests/urllib/httpx/aiohttp/socket 调用，确保本地预处理工具和 Skill 包不外发数据。
 - **mypy**：当前为 advisory（`continue-on-error`），以 `python tools/check.py` 的当前输出为准。
 
 ---
@@ -286,7 +294,7 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 ## 状态
 
 - CLI 完整可用（9 个命令，26 个测试全部通过）
-- Skill 定义完整（SKILL.md + 7 个框架 + 首次校准向导 + 教练对话模式）
+- Skill 定义完整（`skills/bondlens/SKILL.md` + 7 个框架 + 首次校准向导 + 教练对话模式）
 - 文档完整（README + INSTALL.md + chat_record_preparation.md + privacy_model + platform_compatibility + codex_setup）
 - 多平台安装支持（ChatGPT/Claude/Codex/OpenCode/OpenClaw/Agents）
 - CI/CD 配置完成（4 个 workflow，隐私扫描和网络调用扫描为阻断项）

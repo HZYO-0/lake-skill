@@ -1,45 +1,44 @@
-# Codex 安装说明
+# Codex Setup
 
-把以下内容粘贴给 Codex，让它自动安装 Skill。
-
----
-
-```
-请帮我安装 bondlens skill。
-
-步骤：
-
-1. 在当前项目根目录创建 .opencode/skills/bondlens/ 目录
-
-2. 把 SKILL.md 复制到 .opencode/skills/bondlens/SKILL.md
-
-3. 把 references/frameworks/ 下的所有 .md 文件复制到 .opencode/skills/bondlens/references/frameworks/
-
-4. 完成后告诉我目录结构
-
-这个 skill 用于分析亲密关系聊天记录，提供基于证据的沟通分析和教练指导。
-```
-
----
-
-## 手动安装
-
-如果 AI 没有自动执行，可以手动操作：
+## Install from GitHub
 
 ```bash
-mkdir -p .opencode/skills/bondlens/references/frameworks
-cp SKILL.md .opencode/skills/bondlens/
-cp references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo HZYO-0/bondlens \
+  --path skills/bondlens
 ```
 
-## 验证安装
+Windows example:
+
+```powershell
+python C:\Users\<you>\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py `
+  --repo HZYO-0/bondlens `
+  --path skills/bondlens
+```
+
+Restart Codex after installing.
+
+## Install with AgentSkills CLI
 
 ```bash
-# 检查文件是否存在
-ls .opencode/skills/bondlens/SKILL.md
-ls .opencode/skills/bondlens/references/frameworks/
+npx skills add HZYO-0/bondlens -y
 ```
 
-## 使用方式
+## Verify
 
-安装后直接在对话中粘贴聊天记录，或说"帮我分析一下我们的聊天记录"即可触发。
+After restarting Codex, ask:
+
+```text
+使用 bondlens，帮我分析一下这段聊天记录
+```
+
+BondLens should activate only when chat records, redacted CLI exports, or relationship-message drafting requests are present.
+
+## Manual Project Install
+
+```bash
+mkdir -p .codex/skills
+cp -r skills/bondlens .codex/skills/bondlens
+```
+
+Project-local installs are useful for testing, but published GitHub installs should use the `skills/bondlens/` subdirectory.

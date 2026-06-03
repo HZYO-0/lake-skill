@@ -1,4 +1,4 @@
-"""Package skill for multiple platforms from canonical SKILL.md.
+"""Package the canonical BondLens skill for multiple platforms.
 
 Generates platform-specific installation packages in dist/:
   - chatgpt/       : SKILL.md + frameworks (for GPT Knowledge upload)
@@ -18,6 +18,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = PROJECT_ROOT / "dist"
+SKILL_PACKAGE_DIR = PROJECT_ROOT / "skills" / "bondlens"
+FRAMEWORKS_DIR = SKILL_PACKAGE_DIR / "references" / "frameworks"
 
 FRAMEWORKS = [
     "evidence_ladder.md",
@@ -37,29 +39,40 @@ def clean_dist() -> None:
     DIST_DIR.mkdir(parents=True)
 
 
+def copy_skill_package(out: Path) -> None:
+    """Copy the installable BondLens skill package into a platform directory."""
+    out.mkdir(parents=True)
+    shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
+
+    for resource in ("references", "assets", "agents"):
+        src = SKILL_PACKAGE_DIR / resource
+        if src.exists():
+            shutil.copytree(src, out / resource, dirs_exist_ok=True)
+
+
 def package_chatgpt() -> None:
     """Package for ChatGPT Custom GPT (flat structure for upload)."""
     out = DIST_DIR / "chatgpt"
     out.mkdir()
 
-    shutil.copy2(PROJECT_ROOT / "SKILL.md", out / "SKILL.md")
+    shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
 
     fw_out = out / "frameworks"
     fw_out.mkdir()
     for fw in FRAMEWORKS:
-        src = PROJECT_ROOT / "references" / "frameworks" / fw
+        src = FRAMEWORKS_DIR / fw
         if src.exists():
             shutil.copy2(src, fw_out / fw)
 
     (out / "SETUP.md").write_text(
         "# ChatGPT Setup\n\n"
-        "1. Open ChatGPT → Create a GPT\n"
+        "1. Open ChatGPT -> Create a GPT\n"
         "2. Paste `SKILL.md` content into **Instructions**\n"
         "3. Upload all files from `frameworks/` to **Knowledge**\n"
         "4. Start by pasting chat records or saying \"帮我分析一下我们的聊天记录\"\n\n"
         "## Test prompts\n\n"
-        "- **Sparse test**: Paste 5-10 messages → should say data insufficient\n"
-        "- **Full test**: Paste 50+ messages from multiple sessions → should produce 8-item analysis\n",
+        "- **Sparse test**: Paste 5-10 messages -> should say data insufficient\n"
+        "- **Full test**: Paste 50+ messages from multiple sessions -> should produce 8-item analysis\n",
         encoding="utf-8",
     )
     print(f"  chatgpt/ ({len(list(out.rglob('*')))} files)")
@@ -68,23 +81,8 @@ def package_chatgpt() -> None:
 def package_platform(platform: str, skill_subpath: str, install_hint: str) -> None:
     """Package for a platform with skills directory structure."""
     out = DIST_DIR / platform / skill_subpath
-    out.mkdir(parents=True)
+    copy_skill_package(out)
 
-    shutil.copy2(PROJECT_ROOT / "SKILL.md", out / "SKILL.md")
-
-    fw_out = out / "references" / "frameworks"
-    fw_out.mkdir(parents=True)
-    for fw in FRAMEWORKS:
-        src = PROJECT_ROOT / "references" / "frameworks" / fw
-        if src.exists():
-            shutil.copy2(src, fw_out / fw)
-
-    kb_src = PROJECT_ROOT / "skill" / "assets" / "kb_template"
-    if kb_src.exists():
-        kb_out = out / "assets" / "kb_template"
-        shutil.copytree(kb_src, kb_out)
-
-    # Generate INSTALL.txt
     (DIST_DIR / platform / "INSTALL.txt").write_text(
         f"{platform} Installation\n"
         f"{'=' * (len(platform) + 12)}\n\n"
@@ -99,36 +97,45 @@ def package_platform(platform: str, skill_subpath: str, install_hint: str) -> No
 def main() -> int:
     print("Packaging skill for multiple platforms...\n")
 
+    if not (SKILL_PACKAGE_DIR / "SKILL.md").exists():
+        print(f"Missing canonical skill package: {SKILL_PACKAGE_DIR}", file=sys.stderr)
+        return 1
+
     clean_dist()
     package_chatgpt()
     package_platform(
-        "claude", ".claude/skills/bondlens",
+        "claude",
+        ".claude/skills/bondlens",
         "cp -r dist/claude/.claude/ ./.claude/",
     )
     package_platform(
-        "codex", ".codex/skills/bondlens",
+        "codex",
+        ".codex/skills/bondlens",
         "cp -r dist/codex/.codex/ ./.codex/",
     )
     package_platform(
-        "opencode", ".opencode/skills/bondlens",
+        "opencode",
+        ".opencode/skills/bondlens",
         "cp -r dist/opencode/.opencode/ ./.opencode/",
     )
     package_platform(
-        "openclaw", ".openclaw/workspace/skills/bondlens",
+        "openclaw",
+        ".openclaw/workspace/skills/bondlens",
         "cp -r dist/openclaw/.openclaw/ ~/.openclaw/",
     )
     package_platform(
-        "agents", ".agents/skills/bondlens",
+        "agents",
+        ".agents/skills/bondlens",
         "cp -r dist/agents/.agents/ ./.agents/",
     )
 
     print(f"\nDone. Packages in {DIST_DIR}/")
-    print("  chatgpt/  — Paste SKILL.md to Instructions, upload frameworks/ to Knowledge")
-    print("  claude/   — Copy .claude/ to project root or ~/.claude/")
-    print("  codex/    — Copy .codex/ to project root")
-    print("  opencode/ — Copy .opencode/ to project root")
-    print("  openclaw/ — Copy .openclaw/ to ~/.openclaw/")
-    print("  agents/   — Copy .agents/ to project root")
+    print("  chatgpt/  - Paste SKILL.md to Instructions, upload frameworks/ to Knowledge")
+    print("  claude/   - Copy .claude/ to project root or ~/.claude/")
+    print("  codex/    - Copy .codex/ to project root")
+    print("  opencode/ - Copy .opencode/ to project root")
+    print("  openclaw/ - Copy .openclaw/ to ~/.openclaw/")
+    print("  agents/   - Copy .agents/ to project root")
     return 0
 
 

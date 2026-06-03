@@ -1,103 +1,79 @@
 # Platform Compatibility
 
-WRI's `SKILL.md` is a platform-neutral instruction file. Below are the specific installation paths for each supported platform.
+BondLens uses one canonical installable package:
 
-## ChatGPT Custom GPT
-
-1. Open ChatGPT → Create a GPT
-2. Paste `SKILL.md` into **Instructions**
-3. Upload the 7 framework files from `references/frameworks/` to **Knowledge**
-4. Start by pasting chat records directly
-
-No manifest or metadata file needed — ChatGPT uses the Instructions/Knowledge split.
-
-## Claude Code / Claude Projects
-
-**Option A: Claude Project**
-
-1. Create a Project
-2. Paste `SKILL.md` into **Instructions**
-3. Upload framework files to **Knowledge**
-
-**Option B: Claude Code Skills (local)**
-
-Copy files into `.claude/skills/bondlens/`:
-
-```bash
-mkdir -p .claude/skills/bondlens/references/frameworks
-cp SKILL.md .claude/skills/bondlens/
-cp references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
+```text
+skills/bondlens/
 ```
 
-Claude Code discovers skills in `.claude/skills/` automatically. The `SKILL.md` file serves as the primary instruction; framework files are loaded as supporting context.
+That folder contains `SKILL.md`, framework references, knowledge-base templates, and optional agent metadata. The repository root is for development and CLI tooling.
 
-## OpenCode
+## Recommended Install
 
-OpenCode discovers skills from multiple paths:
-
-- `.opencode/skills/<skill-name>/`
-- `.claude/skills/<skill-name>/`
-- `.agents/skills/<skill-name>/`
-
-Copy to any of these:
+Use AgentSkills-compatible installation when available:
 
 ```bash
-mkdir -p .opencode/skills/bondlens/references/frameworks
-cp SKILL.md .opencode/skills/bondlens/
-cp references/frameworks/*.md .opencode/skills/bondlens/references/frameworks/
+npx skills add HZYO-0/bondlens -y
+```
+
+To preview what the repository exposes:
+
+```bash
+npx skills add HZYO-0/bondlens --list
 ```
 
 ## Codex
 
-Copy to `.codex/skills/bondlens/`:
+Codex can install the GitHub subdirectory directly:
 
 ```bash
-mkdir -p .codex/skills/bondlens/references/frameworks
-cp SKILL.md .codex/skills/bondlens/
-cp references/frameworks/*.md .codex/skills/bondlens/references/frameworks/
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo HZYO-0/bondlens \
+  --path skills/bondlens
 ```
 
-Or use the agent install prompt from [`INSTALL.md`](../INSTALL.md).
+Restart Codex after installation.
 
-## OpenClaw
+## ChatGPT Custom GPT
 
-Copy to `~/.openclaw/workspace/skills/bondlens/` (global):
+1. Create a GPT.
+2. Paste `skills/bondlens/SKILL.md` into **Instructions**.
+3. Upload all files from `skills/bondlens/references/frameworks/` to **Knowledge**.
+4. Paste or upload representative chat records.
+
+## Claude Project
+
+Use the same ChatGPT-style paste/upload model:
+
+1. Paste `skills/bondlens/SKILL.md` into the project instructions.
+2. Upload `skills/bondlens/references/frameworks/*.md` as project knowledge.
+
+## Manual Copy Paths
+
+Copy `skills/bondlens/` into the target runtime path:
+
+| Platform | Destination |
+|---|---|
+| Claude Code project | `.claude/skills/bondlens/` |
+| Claude Code global | `~/.claude/skills/bondlens/` |
+| Codex project | `.codex/skills/bondlens/` |
+| OpenCode project | `.opencode/skills/bondlens/` |
+| OpenClaw global | `~/.openclaw/workspace/skills/bondlens/` |
+| Agents project | `.agents/skills/bondlens/` |
+
+Example:
 
 ```bash
-mkdir -p ~/.openclaw/workspace/skills/bondlens/references/frameworks
-cp SKILL.md ~/.openclaw/workspace/skills/bondlens/
-cp references/frameworks/*.md ~/.openclaw/workspace/skills/bondlens/references/frameworks/
+mkdir -p .claude/skills
+cp -r skills/bondlens .claude/skills/bondlens
 ```
 
-## Agents (Generic)
+## Package Layout
 
-Copy to `.agents/skills/bondlens/`:
-
-```bash
-mkdir -p .agents/skills/bondlens/references/frameworks
-cp SKILL.md .agents/skills/bondlens/
-cp references/frameworks/*.md .agents/skills/bondlens/references/frameworks/
-```
-
-## Installation Models
-
-| Model | Description | Platforms |
-|-------|-------------|-----------|
-| **Project-local** | Skill files in project directory | Claude Code, Codex, OpenCode, Agents |
-| **Global** | Skill files in user home directory | Claude Code (`~/.claude/`), OpenClaw (`~/.openclaw/`) |
-| **Paste + Upload** | Paste SKILL.md to Instructions, upload frameworks to Knowledge | ChatGPT, Claude Projects |
-
-Project-local takes precedence over global when both exist.
-
-## Canonical Source
-
-All platforms use the same `SKILL.md`. There is no platform-specific variant. If a platform requires additional metadata, create it alongside (not instead of) the canonical file.
-
-## File Structure
-
-```
-skill/
-├── SKILL.md                              # Primary instruction (canonical)
+```text
+skills/bondlens/
+├── SKILL.md
+├── agents/openai.yaml
 ├── references/frameworks/
 │   ├── evidence_ladder.md
 │   ├── big_five_communication_signals.md
@@ -106,5 +82,15 @@ skill/
 │   ├── forbidden_overclaims.md
 │   ├── symbolic_mode_policy.md
 │   └── coaching_dialogue_framework.md
-└── assets/kb_template/                   # KB templates (12 files)
+└── assets/kb_template/
 ```
+
+## Packaging
+
+Generate platform-specific archives with:
+
+```bash
+python tools/package_skill.py
+```
+
+The generated `dist/` directory is disposable and not committed.

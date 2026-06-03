@@ -81,14 +81,23 @@ def main() -> int:
 
     # 4. Privacy scan (all directories)
     ok, _ = run(
-        [sys.executable, "tools/check_no_real_private_data.py", "cli", "skill", "tools", "tests", "examples", "docs"],
+        [
+            sys.executable,
+            "tools/check_no_real_private_data.py",
+            "cli",
+            "skills",
+            "tools",
+            "tests",
+            "examples",
+            "docs",
+        ],
         "Privacy scan",
     )
     results.append(("privacy-scan", ok))
 
     # 5. Network call scan
     ok, _ = run(
-        [sys.executable, "tools/check_no_forbidden_network_calls.py", "cli", "skill"],
+        [sys.executable, "tools/check_no_forbidden_network_calls.py", "cli", "skills"],
         "Network call scan",
     )
     results.append(("network-scan", ok))

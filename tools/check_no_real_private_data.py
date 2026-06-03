@@ -1,13 +1,14 @@
 """Check files for real private data patterns.
 
 Scans all provided directories. Uses safe-pattern allowlists to distinguish
-synthetic/example data from real PII. Source code (cli/, skill/, tools/) is
-scanned strictly; test/example/doc files are scanned with broader allowlists.
+synthetic/example data from real PII. Source code and skill package directories
+(cli/, skills/, tools/) are scanned strictly; test/example/doc files are scanned
+with broader allowlists.
 
 Usage:
-    python tools/check_no_real_private_data.py cli skill tools
+    python tools/check_no_real_private_data.py cli skills tools
     python tools/check_no_real_private_data.py tests examples docs
-    python tools/check_no_real_private_data.py cli skill tools tests examples docs
+    python tools/check_no_real_private_data.py cli skills tools tests examples docs
 """
 
 import re
@@ -59,7 +60,7 @@ SAFE_PATTERNS = [
 ]
 
 # Source directories: strict scanning (no safe-pattern bypass for source)
-SOURCE_DIRS = {"cli", "skill"}
+SOURCE_DIRS = {"cli", "skills"}
 
 # Files to skip entirely (self-referential, historical)
 SKIP_PATTERNS = [

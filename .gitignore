@@ -53,10 +53,14 @@ build/
 # model outputs (contain actual analysis results)
 examples/model_outputs/*.md
 
-# allow skill templates and synthetic fixtures
-!skill/**
+# allow installable skills and synthetic fixtures
+!skills/**
 !tests/fixtures/**
 !examples/synthetic_input/**
 !examples/synthetic_outputs/**
 !docs/**
 !README.md
+
+# generated local agent installs
+.claude/
+.opencode/
