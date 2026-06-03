@@ -3,7 +3,9 @@
 ## Installation
 
 ```bash
-pip install bondlens
+git clone https://github.com/HZYO-0/bondlens.git
+cd bondlens
+pip install -e ".[dev]"
 ```
 
 ## Initialize Project
@@ -74,6 +76,6 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 
 ## Next Steps
 
-1. Upload `work/digest.redacted.md`, `work/sessions.redacted.jsonl`, and `work/evidence.redacted.jsonl` to ChatGPT Skill
+1. Upload `work/digest.redacted.md`, `work/sessions.redacted.jsonl`, and `work/evidence.redacted.jsonl` to BondLens Skill/Agent
 2. Review the generated reports
 3. Update your knowledge base with new data

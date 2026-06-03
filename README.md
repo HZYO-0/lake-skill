@@ -1,75 +1,56 @@
 # BondLens 关系镜
 
-证据型聊天关系洞察 Skill。不是"他就是回避型"，而是"聊天记录呈现回避相关信号，置信度中等，替代解释包括……"。
+Evidence-based relationship chat analysis for ChatGPT, Claude Code, Codex, OpenCode, OpenClaw, and other Skill/Agent runtimes.
 
-## 安装
+BondLens does **not** tell you "TA is definitely avoidant." It says: "these messages show avoidant-adjacent signals, confidence is medium, counterevidence includes..., and alternative explanations are..."
 
-**一行安装（推荐）** — 在 Claude Code / Codex / OpenCode 中说：
+[![CI](https://github.com/HZYO-0/bondlens/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/bondlens/actions/workflows/ci.yml)
+[![Security](https://github.com/HZYO-0/bondlens/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/bondlens/actions/workflows/security.yml)
 
-> 帮我安装这个 skill：https://github.com/HZYO-0/bondlens
+## Why BondLens
 
-或用 CLI：
+- **Evidence first**: major claims cite evidence IDs, confidence levels, counterevidence, and alternative explanations.
+- **Non-clinical**: personality and attachment outputs are communication hypotheses, not diagnoses.
+- **Privacy-aware**: paste directly for convenience, or use the CLI to redact and summarize locally before upload.
+- **Coaching mode**: turns analysis into safer message drafts and next-step communication options.
+- **Portable Skill**: one canonical `SKILL.md`, packaged for multiple agent runtimes.
+
+## Install
+
+### One-line install
+
+In Claude Code, Codex, OpenCode, or another compatible agent, ask:
+
+```text
+帮我安装这个 skill：https://github.com/HZYO-0/bondlens
+```
+
+If your runtime supports AgentSkills:
 
 ```bash
 npx skills add HZYO-0/bondlens
 ```
 
-<details>
-<summary>手动安装 / 其他平台</summary>
+### ChatGPT Custom GPT
 
-### ChatGPT
+1. Create a GPT.
+2. Paste [`SKILL.md`](SKILL.md) into **Instructions**.
+3. Upload the 7 files in [`references/frameworks/`](references/frameworks/) to **Knowledge**.
+4. Start with a representative chat record sample.
 
-1. 打开 ChatGPT → Create a GPT
-2. 把 [`SKILL.md`](SKILL.md) 全部内容粘贴到 **Instructions**
-3. 把 [`references/frameworks/`](references/frameworks/) 下 7 个 `.md` 文件上传到 **Knowledge**
+Manual platform paths and verification steps are in [`INSTALL.md`](INSTALL.md).
 
-### Claude Code / Codex / OpenCode
+## Quick Start
 
-```bash
-# 自动安装（在项目目录下运行）
-mkdir -p .claude/skills/bondlens/references/frameworks
-cp SKILL.md .claude/skills/bondlens/
-cp references/frameworks/*.md .claude/skills/bondlens/references/frameworks/
+After installing, say:
+
+```text
+帮我分析一下我们的聊天记录
 ```
 
-详细安装指南见 [`INSTALL.md`](INSTALL.md)。
+Then paste or upload chat records:
 
-</details>
-
-## 使用
-
-安装后在对话中说：
-
-> 帮我分析一下我们的聊天记录
-
-然后粘贴或上传聊天记录。首次分析需要足量、有代表性的数据。
-
-```
-references/frameworks/
-├── evidence_ladder.md                    # 证据等级定义
-├── big_five_communication_signals.md     # 大五人格沟通信号
-├── attachment_anxiety_avoidance.md       # 依恋焦虑/回避信号
-├── relationship_communication_patterns.md # 关系互动模式
-├── forbidden_overclaims.md               # 禁止的过度断言
-├── symbolic_mode_policy.md               # 星座/塔罗策略
-└── coaching_dialogue_framework.md        # 教练对话框架
-```
-
-### 4. 导入聊天记录完成首次校准
-
-直接粘贴或上传你的聊天记录。首次分析需要**足量、有代表性**的聊天记录才能给出完整画像。
-
-**输入质量与分析深度**：
-
-| 输入量 | 分析结果 |
-|--------|---------|
-| 5-10 条片段 | 仅低置信局部观察，不输出完整画像 |
-| 多场景代表性聊天（推荐） | 完整 8 项分析，置信度合理 |
-| CLI 脱敏导出 | 完整分析 + 知识库，适合隐私敏感场景 |
-
-**粘贴示例**：
-
-```
+```text
 以下是我和某人的聊天记录，请帮我分析：
 
 2025-05-21 22:13 张三: 今天其实有点想你
@@ -77,72 +58,67 @@ references/frameworks/
 2025-05-21 22:15 张三: 嗯嗯，最近工作有点累
 2025-05-21 22:16 我: 辛苦了，周末要不要一起吃饭
 ...
-（建议包含多个时间段、多种场景的聊天记录）
 ```
 
----
+For a full portrait, provide enough context:
 
-## 它能做什么
+| Input | Expected behavior |
+|---|---|
+| 5-10 messages | Low-confidence local observations only |
+| 30+ messages across multiple sessions | Initial calibrated analysis |
+| 100+ messages across varied scenarios | Stronger relationship portrait and interaction-pattern analysis |
+| CLI redacted export | Full analysis with better privacy control |
 
-### 分析输出（8 项）
+See [`docs/chat_record_preparation.md`](docs/chat_record_preparation.md) for what to include.
 
-1. **关系画像** — 整体关系状态概述
-2. **人格信号** — 非临床的沟通风格分析（大五人格维度）
-3. **依恋假设** — 焦虑/回避/安全型信号，附替代解释
-4. **互动模式** — 正向循环、负向循环、冲突升级路径
-5. **沟通手册** — 针对日常聊天、暧昧推进、冲突修复等场景的建议
-6. **消息草稿** — 温和版/直接版/降压版/有边界版
-7. **知识库** — 可持续更新的关系档案（增量补丁，不覆盖旧判断）
-8. **不确定性说明** — 每个结论的置信度、反证、替代解释
+## What It Produces
 
-### 教练对话
+BondLens can produce:
 
-- **开场**：总结 2-3 个发现，问"你想先聊哪个方面？"
-- **探索**：引用证据 → 置信度 → 替代解释 → 具体建议
-- **修正**：你说"他不会那样做"→ 承认局限 → 更新理解
-- **指导**：你问"我该怎么说？"→ 3 种语气草稿 + 推理
+1. Relationship portrait
+2. Non-clinical personality communication signals
+3. Attachment anxiety/avoidance hypotheses
+4. Interaction pattern analysis
+5. Communication playbook
+6. Message drafts in multiple tones
+7. Knowledge base files or update patches
+8. Uncertainty and safety notes
 
----
+When data is insufficient, BondLens asks a short calibration question set first. If the user wants to skip, it proceeds with explicitly low-confidence observations.
 
-## 支持的输入方式
+## Supported Inputs
 
-| 方式 | 说明 | 隐私级别 |
-|------|------|---------|
-| **直接粘贴** | 在对话框粘贴聊天记录 | 低（数据经过平台） |
-| **上传文件** | 导出聊天记录文件上传 | 低（数据经过平台） |
-| **CLI 预处理** | 本地脱敏后上传摘要（见下方） | 高（原始数据不出本地） |
+| Source | Formats | Notes |
+|---|---|---|
+| WeChat desktop export | TXT, CSV | Best for direct upload or CLI preprocessing |
+| Generic tables | CSV, TSV | Requires timestamp, sender, and content columns |
+| Structured messages | JSONL | Best for repeatable workflows |
+| Plaintext SQLite | `.db`, `.sqlite` | CLI only; no decryption or key extraction |
+| Voice transcripts | SRT, VTT, JSONL | Preserves ASR confidence when available |
+| OCR transcripts | CSV, JSONL | Analyzes extracted text, not raw screenshots |
 
-### 支持的数据源
+BondLens only analyzes user-provided and authorized data. It will not decrypt databases, bypass access controls, scrape private accounts, or help access someone else's records.
 
-| 数据源 | 格式 | 说明 |
-|--------|------|------|
-| 微信电脑版导出 | TXT/CSV | 右键聊天 → 导出聊天记录 |
-| 通用 CSV | CSV | 需包含时间、发送者、内容列 |
-| JSONL | JSONL | 结构化消息数据 |
-| 微信明文数据库 | SQLite | `.db` 文件（不解密加密数据库） |
-| 语音转写 | SRT/VTT | 保留 ASR 置信度字段 |
-| OCR 转写 | JSONL/CSV | 保留 OCR 置信度字段 |
+## Privacy Modes
 
-详细说明见 [`docs/chat_record_preparation.md`](docs/chat_record_preparation.md)。
+| Mode | Raw data leaves your machine? | Best for |
+|---|---:|---|
+| Direct paste/upload | Yes | Fast trial, small private samples you are comfortable uploading |
+| CLI local preprocessing | No | Sensitive data, large histories, repeatable analysis |
 
-### 微信聊天记录导出
+The output structure is the same in both modes. Analysis quality depends on data quantity, context diversity, and how much detail remains after redaction.
 
-- 微信电脑版 → 右键聊天 → 导出聊天记录 → 选择 TXT 或 CSV
-- 或使用第三方导出工具
+## CLI Privacy Workflow
 
----
-
-## CLI 本地预处理（可选，增强隐私）
-
-隐私敏感或数据量大时，可用 CLI 工具在本地预处理，只上传脱敏后的产物。
+Use the CLI when you want local preprocessing before uploading anything to a cloud agent.
 
 ```bash
-# 从源码安装（需要 Python 3.9+）
 git clone https://github.com/HZYO-0/bondlens.git
 cd bondlens
 pip install -e ".[dev]"
 
-bondlens init ./my-project && cd my-project
+bondlens init ./my-project
+cd my-project
 
 bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方
 bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl
@@ -153,71 +129,62 @@ bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions
 bondlens kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
 ```
 
-然后把 `work/` 和 `kb/` 中的文件上传到 Skill/Agent。
+Upload these generated files to your Skill/Agent:
 
----
+- `work/digest.redacted.md`
+- `work/sessions.redacted.jsonl`
+- `work/evidence.redacted.jsonl`
+- `work/conversations.jsonl`
+- `kb/*.md` if using a relationship knowledge base
 
-## 与其他 Skill 的区别
+## Safety Boundaries
 
-| | colleague-skill | ex-skill | **本项目** |
-|---|---|---|---|
-| **核心体验** | 和"AI 版 TA"对话 | 和"前任"对话 | 理解关系 + 改善沟通 |
-| **输出** | AI Persona | AI Persona | 分析报告 + 教练 + 草稿 |
-| **分析依据** | 无证据 | 无证据 | 每个结论有证据 ID、置信度、反证 |
-| **隐私** | 上传原始数据 | 上传原始数据 | 可选本地预处理 |
-| **伦理边界** | 无明确限制 | 无明确限制 | 禁止操控、诊断、确定性断言 |
+BondLens refuses or redirects requests for:
 
----
+- clinical diagnosis, personality disorder labeling, or mental health assessment
+- manipulation, PUA, coercion, jealousy induction, stalking, or emotional blackmail
+- certainty claims about another person's intentions or feelings
+- relationship outcome prediction
+- decrypting or bypassing protected chat databases
 
-## 项目结构
+## Repository Layout
 
-```
-├── SKILL.md                        # Skill 指令（根目录，兼容 AgentSkills 协议）
-├── references/frameworks/          # 分析框架（7 个）
-├── cli/bondlens/                   # Python CLI（可选，隐私增强）
-│   ├── cli.py                      # 命令行入口
-│   ├── schema.py                   # 数据模型
-│   ├── adapters/                   # 输入格式适配器
-│   ├── privacy/                    # 隐私脱敏
-│   ├── segmentation/               # 会话切分
-│   ├── evidence/                   # 证据索引
-│   ├── kb/                         # 知识库管理
-│   └── reports/                    # 报告生成
-├── skill/                          # 补充资源
-│   ├── assets/kb_template/         # 知识库模板
-│   └── agents/                     # Agent 配置
-├── tests/                          # 测试
-├── examples/                       # 合成示例数据
-└── docs/                           # 文档
+```text
+.
+├── SKILL.md                      # Canonical Skill instruction
+├── references/frameworks/        # Evidence, attachment, personality, safety, and coaching frameworks
+├── cli/bondlens/                 # Optional Python CLI for local preprocessing
+├── docs/                         # Installation, privacy, platform, and data-preparation guides
+├── examples/                     # Synthetic inputs and output-structure checks
+├── tests/                        # Unit, integration, and safety tests
+└── tools/                        # Verification, packaging, and scanners
 ```
 
-## 验证
-
-开发环境下的推荐验证命令：
+## Verify Locally
 
 ```bash
-# 安装开发依赖
 pip install -e ".[dev]"
-
-# 运行全部检查（ruff + pytest + 隐私扫描 + 网络扫描）
 python tools/check.py --quick
-
-# 运行完整检查（含 mypy advisory）
 python tools/check.py
-
-# 仅运行测试
-python -m pytest -q
-
-# 打包 Skill（生成 dist/ 下的多平台安装包）
 python tools/package_skill.py
 ```
 
-## 当前限制
+`check.py --quick` runs ruff, tests, privacy scanning, and forbidden-network-call scanning. The full check also runs advisory mypy.
 
-- **CLI 未发布到 PyPI**：`pip install bondlens` 暂不可用。需要从源码安装：`pip install -e ".[dev]"`
-- **mypy 类型检查**：当前为 advisory 模式，0 errors
-- **数据库解密**：不支持解密加密的微信数据库，仅支持明文 SQLite
+## Documentation
 
-## 许可证
+- [`INSTALL.md`](INSTALL.md): install paths for ChatGPT, Claude Code, Codex, OpenCode, OpenClaw, and Agents
+- [`docs/chat_record_preparation.md`](docs/chat_record_preparation.md): what chat data to prepare for the first analysis
+- [`docs/privacy_model.md`](docs/privacy_model.md): direct mode vs. local preprocessing mode
+- [`docs/platform_compatibility.md`](docs/platform_compatibility.md): runtime-specific skill packaging notes
+- [`SECURITY.md`](SECURITY.md): security policy and reporting guidance
 
-MIT License
+## Current Limitations
+
+- The CLI is source-installed for now: `pip install -e ".[dev]"`.
+- SQLite support is for readable plaintext databases only.
+- Audio/image media must be transcribed first; BondLens analyzes text transcripts.
+
+## License
+
+MIT License. See [`LICENSE`](LICENSE).

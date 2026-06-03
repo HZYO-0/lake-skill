@@ -279,7 +279,7 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 
 - **隐私扫描** (`tools/check_no_real_private_data.py`)：扫描 cli/ 和 skill/ 源码中的手机号、身份证、邮箱、银行卡、微信号等 PII 模式。tests/ 和 docs/ 中的示例数据被排除。
 - **网络调用扫描** (`tools/check_no_forbidden_network_calls.py`)：扫描 cli/ 和 skill/ 中的 requests/urllib/httpx/aiohttp/socket 调用，确保本地预处理工具不外发数据。
-- **mypy**：当前为 advisory（`continue-on-error`），0 errors。
+- **mypy**：当前为 advisory（`continue-on-error`），以 `python tools/check.py` 的当前输出为准。
 
 ---
 
@@ -291,5 +291,5 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 - 多平台安装支持（ChatGPT/Claude/Codex/OpenCode/OpenClaw/Agents）
 - CI/CD 配置完成（4 个 workflow，隐私扫描和网络调用扫描为阻断项）
 - 示例数据完整（合成聊天记录 + 预期输出）
-- mypy 类型检查当前为 advisory（非阻断），0 errors
+- mypy 类型检查当前为 advisory（非阻断），以 `python tools/check.py` 的当前输出为准
 - `python tools/package_skill.py` 生成 6 个平台安装包
