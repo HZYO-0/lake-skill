@@ -2,7 +2,7 @@
 name: bondlens
 description: "Evidence-based intimate relationship chat analysis. Analyzes both parties' communication patterns, personality signals, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
 argument-hint: "[分析|教练|更新]"
-version: "2.0.0"
+version: "3.0.0"
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash
 ---
