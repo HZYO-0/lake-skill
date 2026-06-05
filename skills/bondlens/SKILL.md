@@ -2,7 +2,7 @@
 name: bondlens
 description: "Evidence-based intimate relationship chat analysis. Analyzes both parties' communication patterns, personality signals, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
 argument-hint: "[分析|教练|更新]"
-version: "3.0.0"
+version: "4.0.0"
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash
 ---
@@ -39,13 +39,21 @@ Evidence-based intimate relationship chat analysis.
 
 ## 工作流
 
-### Step 0: 确认关系类型与分析目标
+### Step 0: 确认关系类型、分析目标与工作模式
 
 参考 `prompts/intake.md`，在 3 轮对话内收集：
 
 1. **基本信息**：关系类型、当前状态、双方称呼、时长
 2. **典型场景**：一个最近的互动场景
 3. **数据来源**：能提供什么数据
+4. **工作模式**（必选）：
+
+| 模式 | 适用场景 | 输出风格 |
+|------|---------|---------|
+| `support` | 情感支持 | 先共情，再给建议，语气温和 |
+| `practical` | 实操建议 | 先判断，再给动作，语气直接 |
+| `repair` | 关系修复 | 先分析冲突，再给修复步骤，语气谨慎 |
+| `auto` | 默认 | 根据用户消息自动判断 |
 
 每轮可跳过。收集完毕后展示确认汇总。
 
@@ -58,6 +66,7 @@ Evidence-based intimate relationship chat analysis.
   时长：{duration}
   数据来源：{source}
   典型场景：{scene_summary}
+  工作模式：{mode}
 
 确认？（确认 / 修改 [字段名]）
 ```
@@ -109,12 +118,17 @@ Evidence-based intimate relationship chat analysis.
 - 情绪表达模式
 - 话题模式
 - 边界模式
+- 非字面表达模式（反讽、调侃、表情代替文字、网络用语）
 
-**3b: 人格信号提取**
+**3b: 人格信号提取（6 层结构）**
 参考 `prompts/persona_analyzer.md`：
-- 对方维度：表达 DNA、情绪触发器、冲突模式、记忆签名
-- 自我维度：同上结构
-- 大五人格沟通信号
+- Layer 0：硬规则（"when X happens, then Y" 行为规则）
+- Layer 1：身份定位（关系角色认知）
+- Layer 2：表达风格（高频词、句式、表情、原话示例）
+- Layer 3：决策模式（压力行为、说"不"方式）
+- Layer 4：关系行为（亲近/疏远/冲突/修复）
+- Layer 5：边界红线（显性/隐性边界）
+- 每个维度必须有标签翻译 + 原话锚定
 
 **3c: 依恋假设分析**
 参考 `prompts/attachment_analyzer.md`：
