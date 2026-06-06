@@ -14,7 +14,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 @app.command()
@@ -616,6 +616,98 @@ def export(
                 f.write(json.dumps(entry, ensure_ascii=False) + "\n")
         rprint(f"[green]Exported {len(sessions)} conversations (full) -> {output_path}[/green]")
         rprint("[red]Warning: This file contains raw text. Do NOT upload to cloud services.[/red]")
+
+
+@app.command()
+def intake(
+    out: str = typer.Option(".", "--out", "-o", help="Output directory"),
+    relationship_type: str = typer.Option("ambiguous", "--type", help="Relationship type"),
+    status: str = typer.Option("unknown", "--status", help="Current status"),
+    self_name: str = typer.Option("", "--self-name", help="Self name"),
+    target_name: str = typer.Option("", "--target-name", help="Target name"),
+    duration: str = typer.Option("", "--duration", help="Relationship duration"),
+    goal: str = typer.Option("", "--goal", help="Analysis goal"),
+    data_source: str = typer.Option("", "--data-source", help="Data source type"),
+    privacy_mode: str = typer.Option("cloud-safe", "--privacy-mode", help="Privacy mode"),
+    work_mode: str = typer.Option("auto", "--work-mode", help="Work mode (support/practical/repair/auto)"),
+) -> None:
+    """Generate intake configuration files (bondlens_intake.yaml + bondlens_intake.md)."""
+    from .schema import IntakeCard, WorkMode
+    from .intake_io import save_intake_yaml, save_intake_md
+
+    try:
+        mode = WorkMode(work_mode)
+    except ValueError:
+        rprint(f"[red]Error: Invalid work mode: {work_mode}. Use: support, practical, repair, auto[/red]")
+        raise typer.Exit(1)
+
+    out_path = Path(out)
+    card = IntakeCard(
+        relationship_type=relationship_type,
+        status=status,
+        self_name=self_name,
+        target_name=target_name,
+        duration=duration,
+        goal=goal,
+        data_source=data_source,
+        privacy_mode=privacy_mode,
+        work_mode=mode,
+    )
+
+    yaml_path = out_path / "bondlens_intake.yaml"
+    md_path = out_path / "bondlens_intake.md"
+
+    save_intake_yaml(card, yaml_path)
+    save_intake_md(card, md_path)
+
+    rprint(f"[green]Generated {yaml_path}[/green]")
+    rprint(f"[green]Generated {md_path}[/green]")
+
+
+@app.command()
+def doctor(
+    messages: str = typer.Option(..., "--messages", "-m", help="Messages JSONL file"),
+    sessions: Optional[str] = typer.Option(None, "--sessions", "-s", help="Sessions JSONL file (optional)"),
+    out: str = typer.Option(".", "--out", "-o", help="Output directory for data_readiness.md"),
+) -> None:
+    """Check data readiness for analysis. Outputs data_readiness.md."""
+    from .jsonl_utils import read_jsonl
+    from .schema import Message, Session
+    from .doctor_checks import run_doctor_checks, format_readiness_report
+
+    messages_path = Path(messages)
+    if not messages_path.exists():
+        rprint(f"[red]Error: File not found: {messages_path}[/red]")
+        raise typer.Exit(1)
+
+    rprint(f"[blue]Reading messages from {messages_path}...[/blue]")
+    msg_list = [Message(**data) for data in read_jsonl(messages_path)]
+    rprint(f"  Loaded {len(msg_list)} messages")
+
+    sessions_list = None
+    if sessions:
+        sessions_path = Path(sessions)
+        if sessions_path.exists():
+            sessions_list = [Session(**data) for data in read_jsonl(sessions_path)]
+            rprint(f"  Loaded {len(sessions_list)} sessions")
+
+    rprint("[blue]Running data readiness checks...[/blue]")
+    results = run_doctor_checks(msg_list, sessions_list)
+
+    out_path = Path(out)
+    report_path = out_path / "data_readiness.md"
+    report_content = format_readiness_report(results)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(report_content, encoding="utf-8")
+
+    for check in results["checks"]:
+        status_icon = "[green]OK[/green]" if check["passed"] else "[yellow]WARN[/yellow]"
+        rprint(f"  {status_icon} {check['name']}: {check['summary']}")
+
+    rprint(f"\n[green]Report saved to {report_path}[/green]")
+
+    if results["overall"] == "insufficient":
+        rprint("[yellow]Warning: Data may be insufficient for full analysis.[/yellow]")
 
 
 if __name__ == "__main__":

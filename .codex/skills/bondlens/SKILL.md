@@ -1,8 +1,8 @@
 ---
 name: bondlens
-description: "Evidence-based intimate relationship chat analysis. Analyzes both parties' communication patterns, personality signals, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
+description: "Evidence-based intimate relationship chat analysis. Generates action briefs (what to do this week, what to avoid, ready-to-send messages), personality profiles with quote anchoring, interaction pattern analysis, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
 argument-hint: "[分析|教练|更新]"
-version: "4.0.0"
+version: "4.2.0"
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash
 ---
@@ -70,6 +70,8 @@ Evidence-based intimate relationship chat analysis.
 
 确认？（确认 / 修改 [字段名]）
 ```
+
+**CLI 快捷路径**：如果用户通过 CLI 生成了 `bondlens_intake.yaml`，直接读取该文件跳过收集轮次。如果缺少 intake 文件，按上述流程收集后生成 `bondlens_intake.yaml` + `bondlens_intake.md`。
 
 ### Step 1: 数据导入
 
@@ -144,22 +146,39 @@ Evidence-based intimate relationship chat analysis.
 - 修复信号
 
 **3e: 生成报告**
-参考 `prompts/report_builder.md`，生成 8 层结构报告：
+参考 `prompts/report_builder.md`，生成 9 层结构报告：
 
+- **Layer -1: 关系行动卡**（第一屏，参考 `prompts/action_brief_builder.md`）
 - Layer 0: 核心互动规则
 - Layer 1: 关系背景
-- Layer 2: 对方表达 DNA
-- Layer 3: 我的表达 DNA
+- Layer 2: 对方 6 层人格画像
+- Layer 3: 我的 6 层人格画像
 - Layer 4: 互动模式
 - Layer 5: 依恋信号
-- Layer 6: 沟通建议 + 消息草稿
+- Layer 6: 沟通建议（场景剧本）
 - Layer 7: 不确定性说明
 
-每个主要结论必须：
-- 引用证据 ID（E-YYYYMMDD-NNN）
-- 标注置信度（低/中/高）
-- 提供反证或说明无强反证
-- 提供替代解释
+每个主要结论必须使用固定格式：
+- **观察**: 数据中看到了什么
+- **证据**: E-YYYYMMDD-NNN（必须存在于 evidence_index.jsonl）
+- **推断**: 从观察和证据中推断出什么
+- **置信度**: 高/中/低
+- **反证**: 支持相反结论的证据，或"无强反证"
+- **替代解释**: 至少 1 个其他可能的解释
+- **建议**: 基于此结论的行动建议（如适用）
+
+报告开头必须包含覆盖声明（数据范围、总消息量、抽样说明）。
+
+### Step 3f: 质量自检
+
+生成报告后，执行以下自检：
+
+1. **证据完整性**：每条核心结论是否都有证据 ID、置信度、替代解释
+2. **风险词扫描**：检查是否使用了禁用词（肯定/一定/离不开/吃醋/PUA 等）
+3. **覆盖声明**：大数据分析是否说明了抽样量和时间窗口
+4. **Layer 完整性**：报告是否包含 Layer -1（行动卡）和 Layer 0-7
+
+如发现违规，修正后再输出。
 
 ### Step 4: 教练对话
 
@@ -221,8 +240,9 @@ Evidence-based intimate relationship chat analysis.
 ## 输出要求
 
 ### 必须输出
-1. 关系分析报告（8 层结构）
-2. 不确定性说明（每个结论的置信度、反证、替代解释）
+1. **关系行动卡**（Layer -1，报告第一屏，1 分钟内回答"我现在该怎么做"）
+2. 关系分析报告（Layer 0-7 完整结构）
+3. 不确定性说明（每个结论的置信度、反证、替代解释）
 
 ### 可选输出（根据用户需求）
 3. 沟通教练（多语气回复）

@@ -1,28 +1,31 @@
-# Installation
+# Install BondLens
 
-BondLens has one clean installable Skill package:
+BondLens has two parts:
 
-```text
-skills/bondlens/
-```
+| Part | Required? | Purpose |
+|---|---:|---|
+| `skills/bondlens/` | Yes | The installable Skill used by Codex, Claude Code, OpenCode, and similar runtimes |
+| Python CLI | Optional | Local preprocessing, redaction, session segmentation, digest, and evidence indexing |
 
-The repository root is the development project. Use `skills/bondlens/` when installing the Skill.
+For most users, install the Skill first. Install the CLI only if you want privacy-first local preprocessing or large-data workflows.
 
-## AgentSkills CLI
+---
 
-For Claude Code, Codex, OpenCode, OpenClaw, and other compatible runtimes:
+## 1. Install The Skill
+
+### AgentSkills CLI
 
 ```bash
 npx skills add HZYO-0/bondlens -y
 ```
 
-To list detected skills first:
+To inspect detected skills before installing:
 
 ```bash
 npx skills add HZYO-0/bondlens --list
 ```
 
-## Codex Built-In Installer
+### Codex Built-In Installer
 
 ```bash
 python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -30,7 +33,7 @@ python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github
   --path skills/bondlens
 ```
 
-On Windows, the script path is usually:
+Windows:
 
 ```powershell
 python C:\Users\<you>\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py `
@@ -40,25 +43,15 @@ python C:\Users\<you>\.codex\skills\.system\skill-installer\scripts\install-skil
 
 Restart Codex after installing.
 
-## ChatGPT Custom GPT
+### Manual Install
 
-1. Create a GPT.
-2. Paste `skills/bondlens/SKILL.md` into **Instructions**.
-3. Upload all 7 files from `skills/bondlens/references/frameworks/` to **Knowledge**.
-4. The skill also uses structured prompts from `skill/prompts/` (10 files) for its 5-step analysis workflow.
-4. Start with representative chat records.
+Copy `skills/bondlens/` into your runtime's skill directory:
 
-## Manual Install Paths
-
-Copy the contents of `skills/bondlens/` into the relevant runtime path:
-
-| Platform | Destination |
+| Runtime | Destination |
 |---|---|
-| Claude Code project | `.claude/skills/bondlens/` |
-| Claude Code global | `~/.claude/skills/bondlens/` |
 | Codex project | `.codex/skills/bondlens/` |
+| Claude Code project | `.claude/skills/bondlens/` |
 | OpenCode project | `.opencode/skills/bondlens/` |
-| OpenClaw global | `~/.openclaw/workspace/skills/bondlens/` |
 | Agents project | `.agents/skills/bondlens/` |
 
 Example:
@@ -68,20 +61,93 @@ mkdir -p .codex/skills
 cp -r skills/bondlens .codex/skills/bondlens
 ```
 
-## Verify
+---
 
-After installation, start a new agent session and say:
+## 2. Verify Skill Activation
+
+Start a new agent session and ask:
 
 ```text
-帮我分析一下我们的聊天记录
+使用 bondlens，帮我分析一下这段聊天记录
 ```
 
-If BondLens asks for relationship context, analysis goals, data format, time span, or background, the Skill is active.
+The Skill is active if the agent asks for relationship context, data source, time span, or analysis goal, or if it produces a relationship action card before the detailed report.
 
-## CLI Dependencies
+---
 
-The Python CLI is optional and only needed for local preprocessing:
+## 3. Prepare Enough Chat Records
+
+For a first meaningful analysis, provide more than one isolated exchange.
+
+| Input | Expected output |
+|---|---|
+| 5-30 messages | Local observation and a reply draft |
+| 30-100 messages | Initial pattern check |
+| 100+ messages across several days | Action card and focused report |
+| Weeks or months with varied scenes | Full report, playbook, and knowledge-base update |
+
+Recommended scenes: daily chat, help-seeking, cold replies, conflict, repair, warm moments, boundary discussions.
+
+See [docs/chat_record_preparation.md](docs/chat_record_preparation.md).
+
+---
+
+## 4. Optional CLI Install
+
+Use the CLI when raw data is large or privacy-sensitive.
 
 ```bash
+git clone https://github.com/HZYO-0/bondlens.git
+cd bondlens
 pip install -e ".[dev]"
+bondlens version
 ```
+
+Initialize a local project:
+
+```bash
+bondlens init ./my_project
+cd my_project
+```
+
+Typical local pipeline:
+
+```bash
+bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
+bondlens segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
+bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
+bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
+```
+
+Upload these processed files to the Skill:
+
+- `work/digest.redacted.md`
+- `work/sessions.redacted.jsonl`
+- `work/evidence.redacted.jsonl`
+- `work/conversations.jsonl` if you want richer analysis
+
+---
+
+## 5. ChatGPT Custom GPT Setup
+
+1. Create a custom GPT.
+2. Paste `skills/bondlens/SKILL.md` into Instructions.
+3. Upload files from `skills/bondlens/references/frameworks/` to Knowledge.
+4. Upload prompt modules from `skills/bondlens/prompts/` if the GPT supports enough Knowledge files.
+5. Start with representative chat records or local preprocessing outputs.
+
+ChatGPT setup is less deterministic than a native Skill runtime because it does not execute the same local workflow. Prefer Codex or Claude Code for full reports, evidence indexing, and local preprocessing.
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| Skill does not activate | Restart the runtime and verify `skills/bondlens/SKILL.md` is installed under the correct folder |
+| Output is too generic | Provide more messages and at least 3 scene types |
+| Agent makes strong claims | Ask it to rerun with BondLens safety boundaries and cite evidence IDs |
+| Privacy concern | Use CLI redaction and upload only redacted digest/evidence/session files |
+| SQLite import fails | Confirm the database is plaintext SQLite; BondLens does not decrypt protected databases |

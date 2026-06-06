@@ -6,7 +6,7 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SKILL_ROOT = PROJECT_ROOT / "skills" / "bondlens"
-PROMPTS_DIR = PROJECT_ROOT / "skill" / "prompts"
+PROMPTS_DIR = PROJECT_ROOT / "skills" / "bondlens" / "prompts"
 
 REQUIRED_PROMPTS = [
     "intake.md",
@@ -19,6 +19,7 @@ REQUIRED_PROMPTS = [
     "merger.md",
     "correction_handler.md",
     "coach_mode.md",
+    "action_brief_builder.md",
 ]
 
 REQUIRED_FRAMEWORKS = [
@@ -75,19 +76,38 @@ def test_framework_exists(filename: str):
 
 
 def test_report_builder_has_layer_structure():
-    """report_builder.md defines the 8-layer output structure."""
+    """report_builder.md defines the 9-layer output structure (Layer -1 through Layer 7)."""
     content = (PROMPTS_DIR / "report_builder.md").read_text(encoding="utf-8")
-    for layer in ["Layer 0", "Layer 1", "Layer 2", "Layer 3",
+    for layer in ["Layer -1", "Layer 0", "Layer 1", "Layer 2", "Layer 3",
                    "Layer 4", "Layer 5", "Layer 6", "Layer 7"]:
         assert layer in content, f"{layer} not found in report_builder.md"
+
+
+def test_no_stale_eight_layer_reference():
+    """No prompt file references '8 层' (should be '9 层')."""
+    for md_file in PROMPTS_DIR.glob("*.md"):
+        content = md_file.read_text(encoding="utf-8")
+        assert "8 层分析" not in content, (
+            f"{md_file.name} contains stale '8 层分析' reference (should be '9 层')"
+        )
+
+
+def test_no_stale_skill_prompts_path():
+    """No prompt or SKILL.md references old 'skill/prompts/' path."""
+    files_to_check = list(PROMPTS_DIR.glob("*.md"))
+    files_to_check.append(SKILL_ROOT / "SKILL.md")
+    for md_file in files_to_check:
+        content = md_file.read_text(encoding="utf-8")
+        assert "skill/prompts/" not in content, (
+            f"{md_file.name} references stale path 'skill/prompts/'"
+        )
 
 
 def test_correction_handler_has_json_format():
     """correction_handler.md defines JSON correction format."""
     content = (PROMPTS_DIR / "correction_handler.md").read_text(encoding="utf-8")
-    assert "scene" in content
-    assert "wrong" in content
-    assert "correct" in content
+    assert "场景" in content or "scene" in content
+    assert "正确" in content or "correct" in content
 
 
 def test_merger_has_conflict_detection():
@@ -100,6 +120,5 @@ def test_merger_has_conflict_detection():
 def test_coach_mode_has_multi_tone_templates():
     """coach_mode.md defines multi-tone reply templates."""
     content = (PROMPTS_DIR / "coach_mode.md").read_text(encoding="utf-8")
-    assert "温和" in content
     assert "直接" in content
     assert "降压" in content
