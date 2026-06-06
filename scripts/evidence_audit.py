@@ -160,7 +160,7 @@ def main():
         print("    [OK] 所有记录符合 schema")
 
     # 2. 审计每个 v4 报告
-    print(f"\n[2] 审计 v4 报告文件")
+    print("\n[2] 审计 v4 报告文件")
     report_files = sorted(analyses_dir.glob("*_v4.md"))
     if not report_files:
         print("    [WARN] 未找到 *_v4.md 报告文件")
@@ -186,11 +186,11 @@ def main():
         print(f"    引用证据数: {len(result['evidence_refs'])}")
 
         if result["missing_in_index"]:
-            print(f"    [MISSING] 以下证据 ID 在报告中引用但不在 index 中:")
+            print("    [MISSING] 以下证据 ID 在报告中引用但不在 index 中:")
             for eid in result["missing_in_index"]:
                 print(f"      - {eid}")
         if result["unused_in_index"]:
-            print(f"    [UNUSED] 以下证据在 index 中但未被任何报告引用:")
+            print("    [UNUSED] 以下证据在 index 中但未被任何报告引用:")
             for eid in result["unused_in_index"]:
                 print(f"      - {eid}")
 
@@ -209,11 +209,11 @@ def main():
             print(f"    - {eid}")
 
     if all_missing:
-        print(f"\n  [ACTION] 需要补充以下证据到 evidence_index.jsonl:")
+        print("\n  [ACTION] 需要补充以下证据到 evidence_index.jsonl:")
         for eid in sorted(all_missing):
             print(f"    - {eid}")
     else:
-        print(f"\n  [PASS] 所有报告引用的证据均在 index 中")
+        print("\n  [PASS] 所有报告引用的证据均在 index 中")
 
     # 返回退出码
     has_issues = bool(schema_errors or all_missing)
