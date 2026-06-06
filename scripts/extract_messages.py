@@ -104,12 +104,12 @@ def main():
 
         # Build output
         lines = []
-        lines.append(f"=" * 80)
+        lines.append("=" * 80)
         lines.append(f"BATCH: {batch_name}")
         lines.append(f"DATE RANGE: {start_str} to {end_str}")
         lines.append(f"TOTAL MESSAGES IN RANGE: {total_in_range}")
         lines.append(f"OUTPUT: {'ALL MESSAGES' if include_all else f'SAMPLE ({SAMPLE_SIZE} messages)'}")
-        lines.append(f"=" * 80)
+        lines.append("=" * 80)
         lines.append("")
 
         if include_all:
@@ -167,7 +167,7 @@ def main():
             mode = "ALL" if include_all else f"SAMPLE({SAMPLE_SIZE})"
             f.write(f"  {batch_name}: {total:>6} msgs ({start_str} to {end_str}) [{mode}]\n")
 
-    print(f"\nDone!", file=sys.stderr)
+    print("\nDone!", file=sys.stderr)
     print(f"Output directory: {OUTPUT_DIR}", file=sys.stderr)
     print(f"Combined file: {combined_path}", file=sys.stderr)
     print(f"Summary file: {summary_path}", file=sys.stderr)

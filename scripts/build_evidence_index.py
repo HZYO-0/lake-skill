@@ -2,7 +2,6 @@
 从 v4 报告中提取所有证据，生成统一的 evidence_index.jsonl。
 """
 import json
-import re
 from pathlib import Path
 
 ANALYSES_DIR = Path("F:/WeChat Relationship Insight/analyses/zy-tf")
