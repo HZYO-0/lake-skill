@@ -146,3 +146,30 @@ class Session(BaseModel):
     episode_type: list[str] = Field(default_factory=list)
     risk_level: Optional[str] = None
     message_ids: list[str] = Field(default_factory=list)
+
+
+class WorkMode(str, Enum):
+    """Working mode for analysis."""
+
+    SUPPORT = "support"
+    PRACTICAL = "practical"
+    REPAIR = "repair"
+    AUTO = "auto"
+
+
+class IntakeCard(BaseModel):
+    """Machine-readable intake configuration."""
+
+    relationship_type: str = "ambiguous"
+    status: str = "unknown"
+    self_name: str = ""
+    target_name: str = ""
+    duration: str = ""
+    goal: str = ""
+    data_source: str = ""
+    privacy_mode: str = "cloud-safe"
+    output_preference: str = "action_card_first"
+    work_mode: WorkMode = WorkMode.AUTO
+    scene_summary: str = ""
+    created_at: datetime = Field(default_factory=datetime.now)
+    version: str = "4.2.0"

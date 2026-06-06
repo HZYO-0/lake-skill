@@ -1,3 +1,5 @@
+<!-- DEPRECATED: canonical source is skills/bondlens/prompts/intake.md -->
+
 # BondLens 信息收集 Prompt
 
 ## 目标

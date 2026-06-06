@@ -1,100 +1,122 @@
-# 聊天记录准备指南
+# Chat Record Preparation Guide
 
-## 第一次有效分析需要什么
-
-| 条件 | 最低要求 | 推荐 |
-|------|---------|------|
-| 消息数量 | ~30 条 | 100+ 条 |
-| 时间跨度 | 数天 | 数周到数月 |
-| 双方发言 | 至少各 5 条 | 双方均衡 |
-| 场景覆盖 | 1-2 种 | 5+ 种（日常、冲突、修复、邀约、冷淡、升温） |
-
-数据越丰富，结论越稳定。少量片段只能做低置信局部观察。
+BondLens is only as good as the relationship evidence you provide. The goal is not to upload the largest possible archive; the goal is to provide enough representative scenes for the Skill to distinguish a one-off moment from a repeated pattern.
 
 ---
 
-## 三种导入方式
+## How Much Data Is Enough?
 
-### A. 直接粘贴（最快，适合试用）
+| Data level | Minimum | Recommended use |
+|---|---:|---|
+| Tiny excerpt | 5-30 messages | Understand one reply, draft one message |
+| Initial analysis | 30-100 messages | Identify tentative communication signals |
+| Useful action card | 100+ messages across several days | Decide what to do this week |
+| Full relationship report | Several weeks or months | Build profiles, interaction loops, playbook, uncertainty layer |
 
-直接把聊天记录粘贴到对话框：
+If you only provide a short excerpt, BondLens should mark conclusions as low confidence and avoid stable personality or attachment claims.
 
+---
+
+## Scene Coverage Matters More Than Raw Count
+
+Try to include several of these scenes:
+
+| Scene | Why it matters |
+|---|---|
+| Daily baseline chat | Normal rhythm, tone, response length |
+| Help-seeking | Trust, practical closeness, reciprocity |
+| Warm moments | Affection, safety, approach signals |
+| Delayed or short replies | Withdrawal, boundaries, workload, uncertainty |
+| Conflict or pressure | Escalation path and stress behavior |
+| Repair or apology | Whether the relationship can recover |
+| Boundary discussions | What not to push |
+| Future plans or invitations | Initiative and investment |
+
+For a first full report, aim for at least 3-5 scene types.
+
+---
+
+## Three Import Paths
+
+### A. Paste Chat Records
+
+Fastest path for testing.
+
+```text
+以下是我和某人的聊天记录，请用 BondLens 分析：
+
+2026-06-01 22:13 我: 今天有点不知道怎么接她的话
+2026-06-01 22:14 对方: ...
 ```
-以下是我和某人的聊天记录，请帮我分析：
 
-2025-05-21 22:13 张三: 今天其实有点想你
-2025-05-21 22:14 我: 真的吗？我也在想你
-...
-```
+Use this for short excerpts, reply drafts, and low-confidence local observations.
 
-- 优点：零门槛，立即开始
-- 缺点：数据经过平台，适合快速试用
+### B. Upload A File
 
-### B. 上传文件（适合较长记录）
+Use this for longer records.
 
-支持格式：
-- **TXT**：微信电脑版导出格式
-- **CSV**：通用表格格式（需包含时间、发送者、内容列）
-- **JSONL**：结构化数据
+Supported formats:
 
-```
-请帮我分析这个聊天记录文件：[上传 chat.txt 或 chat.csv]
-```
+- TXT
+- CSV/TSV
+- JSONL
+- Plaintext SQLite
+- SRT/VTT transcripts
+- OCR text outputs
 
-### C. CLI 本地预处理（隐私优先）
+CSV should include timestamp, sender, and content columns. TXT should preserve timestamps and speaker names where possible.
 
-适合隐私敏感或数据量大的场景。原始数据不出本地，只上传脱敏摘要。
+### C. Local Preprocessing
+
+Use this for privacy-sensitive or large datasets. Raw data stays local; only redacted artifacts are uploaded.
 
 ```bash
-# 安装 CLI
-pip install -e ".[dev]"
-
-# 完整 pipeline
-bondlens init ./my-project && cd my-project
-bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方
-bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl
+bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
 bondlens segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
 bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
 bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
 bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
-bondlens kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
 ```
 
-上传以下文件到 Skill：
+Upload:
+
 - `work/digest.redacted.md`
 - `work/sessions.redacted.jsonl`
 - `work/evidence.redacted.jsonl`
 - `work/conversations.jsonl`
-- `kb/*.md`（如有）
 
 ---
 
-## 推荐提供的场景
+## Context To Provide With The Data
 
-分析越准，需要覆盖的场景越多：
+Add a short intake note:
 
-| 场景 | 为什么重要 |
-|------|-----------|
-| 日常聊天 | 基线沟通风格 |
-| 邀约/计划 | 主动性和投入度 |
-| 冲突/争吵 | 冲突模式和升级路径 |
-| 修复/道歉 | 修复能力和安全依恋信号 |
-| 冷淡/回避 | 回避模式和边界信号 |
-| 升温/暧昧 | 情感表达和推进节奏 |
-| 边界讨论 | 边界表达和尊重程度 |
+```text
+关系类型：
+当前状态：
+双方称呼：
+我最想知道：
+最近典型场景：
+数据时间范围：
+是否需要先给行动卡：
+```
 
----
-
-## 微信聊天记录导出
-
-- 微信电脑版 → 右键聊天 → 导出聊天记录 → 选择 TXT 或 CSV
-- 或使用第三方导出工具
+This prevents the agent from guessing the relationship context.
 
 ---
 
-## 不支持
+## Privacy And Safety
 
-- 解密微信数据库
-- 绕过访问控制
-- 抓取对方未授权的数据
-- 处理原始截图/图片（只分析 OCR 转写文本）
+Do not upload data you do not have permission to use. BondLens does not decrypt databases, bypass access controls, or infer hidden intent with certainty.
+
+Before uploading to a cloud model, consider removing:
+
+- Real names
+- Phone numbers
+- Addresses
+- Account IDs
+- Private third-party details
+- Financial, medical, or legal identifiers
+
+Use `cloud-safe` redaction when possible.
