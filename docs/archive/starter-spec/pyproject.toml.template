@@ -1,6 +1,6 @@
 [project]
 name = "wechat-relationship-insight"
-version = "0.1.0"
+version = "0.9.0"
 description = "Privacy-first local preprocessing toolkit and ChatGPT Skill for evidence-based intimate relationship chat analysis."
 readme = "README.md"
 requires-python = ">=3.11"

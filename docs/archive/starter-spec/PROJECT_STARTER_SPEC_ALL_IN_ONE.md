@@ -1533,7 +1533,7 @@ dist/skill.zip
 - GitHub release 附带 `skill.zip` 和 checksums。
 - 仓库无真实聊天数据。
 
-## v1.0 功能边界
+## 0.9.0 功能边界
 
 支持：
 
@@ -2226,13 +2226,13 @@ release notes
 版本建议：
 
 ```text
-v0.1.0 skill skeleton
-v0.2.0 jsonl/csv/txt pipeline
-v0.3.0 sqlite support
-v0.4.0 asr/ocr transcript support
-v0.5.0 privacy modes
-v0.6.0 evidence/kb patch
-v1.0.0 first stable release
+0.9.0 skill skeleton
+0.9.0 jsonl/csv/txt pipeline
+0.9.0 sqlite support
+0.9.0 asr/ocr transcript support
+0.9.0 privacy modes
+0.9.0 evidence/kb patch
+0.9.0 first stable release
 ```
 
 

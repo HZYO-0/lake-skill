@@ -14,7 +14,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-VERSION = "0.2.0"
+VERSION = "0.9.0"
 
 
 @app.command()

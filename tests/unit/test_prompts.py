@@ -96,10 +96,10 @@ def test_no_stale_eight_layer_reference():
         )
 
 
-def test_skill_version_is_v43():
-    """SKILL.md is bumped to the v4.3 reliability workflow."""
+def test_skill_version_is_v090():
+    """SKILL.md is bumped to the 0.9.0 reliability workflow."""
     content = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-    assert 'version: "4.3.0"' in content
+    assert 'version: "0.9.0"' in content
     assert "关系信号台账" in content
     assert "可靠性审计" in content
 
@@ -136,8 +136,8 @@ def test_coach_mode_has_multi_tone_templates():
     assert "降压" in content
 
 
-def test_v43_reliability_prompts_define_required_artifacts():
-    """v4.3 prompts require ledger, contradiction ledger, and multi-factor interpretation."""
+def test_v090_reliability_prompts_define_required_artifacts():
+    """0.9.0 prompts require ledger, contradiction ledger, and multi-factor interpretation."""
     signal_extractor = (PROMPTS_DIR / "relationship_signal_extractor.md").read_text(encoding="utf-8")
     weighting = (PROMPTS_DIR / "signal_weighting.md").read_text(encoding="utf-8")
     report_builder = (PROMPTS_DIR / "report_builder.md").read_text(encoding="utf-8")

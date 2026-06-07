@@ -1,13 +1,24 @@
 """Regression tests for BondLens relationship signal reliability audit."""
 
+import importlib.util
 import json
+import sys
 import uuid
 from pathlib import Path
 
-from scripts.relationship_signal_audit import audit_paths
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACT_ROOT = PROJECT_ROOT / "work" / "test-artifacts" / "relationship_signal_audit"
+AUDIT_MODULE_PATH = PROJECT_ROOT / "scripts" / "relationship_signal_audit.py"
+
+_audit_spec = importlib.util.spec_from_file_location(
+    "bondlens_relationship_signal_audit", AUDIT_MODULE_PATH
+)
+assert _audit_spec is not None
+assert _audit_spec.loader is not None
+_audit_module = importlib.util.module_from_spec(_audit_spec)
+sys.modules[_audit_spec.name] = _audit_module
+_audit_spec.loader.exec_module(_audit_module)
+audit_paths = _audit_module.audit_paths
 
 
 def _case_dir(name: str) -> Path:
