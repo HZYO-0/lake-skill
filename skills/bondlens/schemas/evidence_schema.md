@@ -17,7 +17,7 @@
   "counter_evidence": "反证描述或 null",
   "alternative_explanation": "替代解释",
   "source_file": "消息来源文件路径",
-  "analysis_version": "v4"
+  "analysis_version": "0.9.0"
 }
 ```
 

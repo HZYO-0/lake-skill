@@ -32,7 +32,7 @@ class KBProfile(BaseModel):
 class KBMetadata(BaseModel):
     """Knowledge base metadata."""
 
-    version: str = "1.0"
+    version: str = "0.9.0"
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     message_count: int = 0

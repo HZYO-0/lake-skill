@@ -128,7 +128,7 @@ Upload `kb/*.md` when asking for incremental updates.
 
 ## Output Checklist
 
-A complete v4.1 report should include:
+A complete 0.9.0 report should include:
 
 - Relationship action card as the first screen
 - Coverage declaration

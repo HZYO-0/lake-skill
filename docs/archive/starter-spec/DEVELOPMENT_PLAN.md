@@ -246,7 +246,7 @@ dist/skill.zip
 - GitHub release 附带 `skill.zip` 和 checksums。
 - 仓库无真实聊天数据。
 
-## v1.0 功能边界
+## 0.9.0 功能边界
 
 支持：
 

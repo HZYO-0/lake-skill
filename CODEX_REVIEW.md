@@ -3,7 +3,7 @@
 ## 项目概述
 
 **名称**：BondLens 关系镜
-**版本**：0.1.0
+**版本**：0.9.0
 **类型**：ChatGPT/Claude Custom Skill + Python CLI 工具
 **定位**：基于证据的亲密关系沟通分析工具
 

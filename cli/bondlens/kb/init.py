@@ -27,7 +27,7 @@ def initialize_kb(
     """
     # Create metadata
     metadata = KBMetadata(
-        version="1.0",
+        version="0.9.0",
         created_at=datetime.now(),
         updated_at=datetime.now(),
         message_count=len(messages),

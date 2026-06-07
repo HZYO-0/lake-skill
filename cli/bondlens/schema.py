@@ -172,4 +172,4 @@ class IntakeCard(BaseModel):
     work_mode: WorkMode = WorkMode.AUTO
     scene_summary: str = ""
     created_at: datetime = Field(default_factory=datetime.now)
-    version: str = "4.3.0"
+    version: str = "0.9.0"

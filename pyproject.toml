@@ -1,6 +1,6 @@
 [project]
 name = "bondlens"
-version = "0.2.0"
+version = "0.9.0"
 description = "BondLens — Evidence-based relationship chat analysis Skill with privacy-first local preprocessing."
 readme = "README.md"
 requires-python = ">=3.9"
