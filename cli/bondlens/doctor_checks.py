@@ -6,6 +6,27 @@ from typing import Optional
 from .schema import Message, Session, SenderRole
 
 
+T1_KEYWORDS = [
+    "喜欢",
+    "表白",
+    "在一起",
+    "对象",
+    "男朋友",
+    "女朋友",
+    "什么关系",
+    "朋友",
+    "不合适",
+    "不可能",
+    "慢慢来",
+    "以后再看",
+    "边界",
+    "控制欲",
+    "回避型",
+    "不配",
+    "耽误",
+]
+
+
 def run_doctor_checks(
     messages: list[Message], sessions: Optional[list[Session]] = None
 ) -> dict:
@@ -20,6 +41,7 @@ def run_doctor_checks(
         check_date_range(messages),
         check_both_side_balance(messages),
         check_scene_coverage(messages, sessions),
+        check_relationship_signal_coverage(messages),
         check_privacy_risk(messages),
     ]
 
@@ -126,6 +148,44 @@ def check_privacy_risk(messages: list[Message]) -> dict:
         return {"name": "隐私风险", "passed": False, "summary": "未脱敏", "detail": "消息未脱敏，上传前请运行 bondlens redact"}
 
 
+def check_relationship_signal_coverage(messages: list[Message]) -> dict:
+    """Check if data appears to contain T1 relationship-definition signals."""
+    if not messages:
+        return {"name": "T1 关系信号", "passed": False, "summary": "无消息", "detail": "无法检查关系定义信号"}
+
+    hits: list[tuple[str, str]] = []
+    for message in messages:
+        text = message.text or message.text_redacted or message.raw_text or ""
+        if not text:
+            continue
+        matched = [kw for kw in T1_KEYWORDS if kw in text]
+        if matched:
+            hits.append((message.message_id, matched[0]))
+
+    if len(hits) >= 3:
+        examples = ", ".join(f"{mid}:{kw}" for mid, kw in hits[:3])
+        return {
+            "name": "T1 关系信号",
+            "passed": True,
+            "summary": f"{len(hits)} 条候选",
+            "detail": f"检测到关系定义候选信号（{examples}），仍需生成 relationship_signal_ledger 审计",
+        }
+    if hits:
+        examples = ", ".join(f"{mid}:{kw}" for mid, kw in hits[:3])
+        return {
+            "name": "T1 关系信号",
+            "passed": False,
+            "summary": f"{len(hits)} 条候选",
+            "detail": f"T1 候选信号较少（{examples}），强关系判断需标注低置信度",
+        }
+    return {
+        "name": "T1 关系信号",
+        "passed": False,
+        "summary": "未检测到候选",
+        "detail": "消息量即使充分，也不足以判断关系性质；需补充表白、拒绝、边界、关系定义或自我认知对话",
+    }
+
+
 def format_readiness_report(results: dict) -> str:
     """Format doctor check results as markdown."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -164,5 +224,6 @@ def format_readiness_report(results: dict) -> str:
         lines.append("- 补充更多聊天记录（目标 100+ 条）")
         lines.append("- 确保覆盖至少 7 天的时间跨度")
         lines.append("- 确保双方都有参与对话")
+        lines.append("- 补充 T1 关系定义信号：表白、拒绝、边界、条件性接受、自我认知或未来时间线")
 
     return "\n".join(lines)

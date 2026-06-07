@@ -39,6 +39,23 @@ High confidence:
 - Not based on a single event.
 - Still avoid certainty words.
 
+## Relationship signal precedence
+
+For relationship-state claims, evidence level and signal tier are separate:
+
+- T1 relationship-definition evidence outranks T3/T4 frequency.
+- T4 statistics never support a strong relationship conclusion by themselves.
+- A direct rejection, direct boundary, conditional acceptance, self-understanding statement, or future timeline must be preserved as a distinct signal.
+- A single T1 event can be high importance but still low confidence for global conclusions; use it to constrain interpretation, not to force a final answer.
+- Contradictory T1 evidence requires a multi-factor explanation, not a binary tie-break.
+
+Strong conclusions require:
+
+1. T1/T2 evidence in the relationship signal ledger.
+2. Counterevidence reviewed.
+3. Alternative explanations listed.
+4. No T4-only inference.
+
 ## Required claim template
 
 ```markdown

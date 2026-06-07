@@ -20,6 +20,10 @@ REQUIRED_PROMPTS = [
     "correction_handler.md",
     "coach_mode.md",
     "action_brief_builder.md",
+    "signal_weighting.md",
+    "relationship_signal_extractor.md",
+    "multi_factor_interpreter.md",
+    "relationship_timeline_builder.md",
 ]
 
 REQUIRED_FRAMEWORKS = [
@@ -92,6 +96,14 @@ def test_no_stale_eight_layer_reference():
         )
 
 
+def test_skill_version_is_v43():
+    """SKILL.md is bumped to the v4.3 reliability workflow."""
+    content = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    assert 'version: "4.3.0"' in content
+    assert "关系信号台账" in content
+    assert "可靠性审计" in content
+
+
 def test_no_stale_skill_prompts_path():
     """No prompt or SKILL.md references old 'skill/prompts/' path."""
     files_to_check = list(PROMPTS_DIR.glob("*.md"))
@@ -122,3 +134,26 @@ def test_coach_mode_has_multi_tone_templates():
     content = (PROMPTS_DIR / "coach_mode.md").read_text(encoding="utf-8")
     assert "直接" in content
     assert "降压" in content
+
+
+def test_v43_reliability_prompts_define_required_artifacts():
+    """v4.3 prompts require ledger, contradiction ledger, and multi-factor interpretation."""
+    signal_extractor = (PROMPTS_DIR / "relationship_signal_extractor.md").read_text(encoding="utf-8")
+    weighting = (PROMPTS_DIR / "signal_weighting.md").read_text(encoding="utf-8")
+    report_builder = (PROMPTS_DIR / "report_builder.md").read_text(encoding="utf-8")
+    persona = (PROMPTS_DIR / "persona_analyzer.md").read_text(encoding="utf-8")
+
+    assert "relationship_signal_ledger.jsonl" in signal_extractor
+    assert "contradiction_ledger.md" in signal_extractor
+    assert "T4 永远不能推翻 T1" in weighting
+    assert "relationship_signal_audit.py" in report_builder
+    assert "stable_trait" in persona
+    assert "self_statement" in persona
+
+
+def test_action_brief_has_degraded_mode():
+    """Action brief must degrade when T1 evidence or reliability audit is missing."""
+    content = (PROMPTS_DIR / "action_brief_builder.md").read_text(encoding="utf-8")
+    assert "降级行动卡" in content
+    assert "缺少 T1" in content
+    assert "审计状态" in content

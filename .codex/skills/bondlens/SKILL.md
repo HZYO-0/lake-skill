@@ -2,7 +2,7 @@
 name: bondlens
 description: "Evidence-based intimate relationship chat analysis. Generates action briefs (what to do this week, what to avoid, ready-to-send messages), personality profiles with quote anchoring, interaction pattern analysis, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
 argument-hint: "[分析|教练|更新]"
-version: "4.2.0"
+version: "4.3.0"
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash
 ---
@@ -112,18 +112,48 @@ Evidence-based intimate relationship chat analysis.
 
 ### Step 3: 分析执行
 
-执行以下分析流程：
+**3a: 关系信号台账（强制前置）**
+参考 `prompts/relationship_signal_extractor.md` 和 `prompts/signal_weighting.md`：
+- 先生成 `relationship_signal_ledger.jsonl` / `relationship_signal_ledger.md`
+- 同步生成 `contradiction_ledger.md`
+- T1 必须全量扫描：表白、拒绝、关系定义、条件性接受、边界、自我认知、未来时间线、矛盾/摇摆表达
+- T4 只做统计和语言风格背景，不能推翻 T1
+- 用户口述事件和用户纠正同等进入台账
 
-**3a: 沟通模式分析**（BondLens 独有）
+**3b: Timeline First**
+参考 `prompts/relationship_timeline_builder.md`：
+- 用 T1/T2 划分关系阶段
+- 每个阶段说明能判断什么、不能判断什么
+- 避免用早期拒绝覆盖后期条件性表达，或用后期暧昧抹掉早期边界
+
+**3c: 多因子解释**
+参考 `prompts/multi_factor_interpreter.md`：
+- 核心判断必须拆成多因子：感情/吸引、回避或自我保护、现实顾虑、愧疚、自我价值、安全/信任、用户压力
+- 禁止把结论压成"喜欢/不喜欢"或"回避/不回避"二选一
+- 如果 T1 不足，输出"不足以判断关系性质"
+
+**3d: 当前局势判断**（优先于行动建议）
+基于最近 1 个月的 T1/T2 信号：
+- 当前关系阶段是什么
+- 最近发生了什么关键事件
+- 对方最近的态度/行为信号
+- 趋势判断（升温/稳定/降温）
+- 这是行动卡的直接输入
+- 如果最近缺少 T1/T2，只能输出低置信度观察，不用 T4 补强
+
+**3e: 沟通模式分析**
 参考 `prompts/communication_analyzer.md`：
-- 响应模式（响应时间、消息长度、开启话题）
-- 情绪表达模式
-- 话题模式
-- 边界模式
-- 非字面表达模式（反讽、调侃、表情代替文字、网络用语）
+- 响应模式（响应时间、消息长度、开启话题）— 基于 T4 统计
+- 情绪表达模式 — 基于 T2 信号
+- 话题模式 — 基于 T3/T4
+- 边界模式 — 基于 T2/T3
+- 非字面表达模式 — 基于 T2/T3
 
-**3b: 人格信号提取（6 层结构）**
+**3f: 人格信号提取（6 层结构）**
 参考 `prompts/persona_analyzer.md`：
+- 基于关系信号台账中的 T1/T2 + 全时段 T3 信号
+- 每条人格结论标注：稳定特征、压力状态、关系特定行为、自我陈述
+- 依恋相关只输出"信号假设"，不输出诊断
 - Layer 0：硬规则（"when X happens, then Y" 行为规则）
 - Layer 1：身份定位（关系角色认知）
 - Layer 2：表达风格（高频词、句式、表情、原话示例）
@@ -132,31 +162,43 @@ Evidence-based intimate relationship chat analysis.
 - Layer 5：边界红线（显性/隐性边界）
 - 每个维度必须有标签翻译 + 原话锚定
 
-**3c: 依恋假设分析**
+**3g: 依恋假设分析**
 参考 `prompts/attachment_analyzer.md`：
+- 基于 T2/T3 信号
+- 纳入 T1 自我陈述，但必须同时检查行为反证
 - 对方依恋信号（焦虑/回避/安全）
 - 自我依恋信号
 - 混合模式识别
 
-**3d: 互动模式分析**
+**3h: 互动模式分析**
 参考 `prompts/interaction_analyzer.md`：
+- 基于全时段 T3 模式
 - 正向循环
 - 负向循环
 - 冲突升级路径
 - 修复信号
 
-**3e: 生成报告**
-参考 `prompts/report_builder.md`，生成 9 层结构报告：
+**3i: 生成报告**
+参考 `prompts/report_builder.md`，生成报告：
 
-- **Layer -1: 关系行动卡**（第一屏，参考 `prompts/action_brief_builder.md`）
-- Layer 0: 核心互动规则
-- Layer 1: 关系背景
-- Layer 2: 对方 6 层人格画像
-- Layer 3: 我的 6 层人格画像
-- Layer 4: 互动模式
-- Layer 5: 依恋信号
-- Layer 6: 沟通建议（场景剧本）
+- **Layer -1: 关系行动卡**（第一屏，仅引用通过审计的 T1/T2/T3 信号）
+- Layer 0.5: 当前局势（最近 T1/T2 信号摘要）
+- Layer 1.5: 关系信号台账摘要
+- Layer 2-3: 双方人格画像（基于全时段 T2/T3 信号）
+- Layer 4: 互动模式（基于 T3 模式）
+- Layer 5: 依恋信号（基于 T2/T3）
+- Layer 6: 沟通建议（基于人格画像 + 当前局势）
 - Layer 7: 不确定性说明
+
+**3j: 可靠性审计**
+运行 `scripts/relationship_signal_audit.py`（或按其规则手动审计）：
+- T1 是否全部进入主结论
+- 是否存在 T4 覆盖 T1
+- 是否遗漏用户纠正指出的证据
+- 是否出现"就是不喜欢/就是回避型"等单因子断言
+- 人格画像是否包含反证和替代解释
+
+审计未通过时，报告状态必须是"低置信度草案"，行动卡只能输出补充语境和低风险观察。
 
 每个主要结论必须使用固定格式：
 - **观察**: 数据中看到了什么
@@ -169,7 +211,7 @@ Evidence-based intimate relationship chat analysis.
 
 报告开头必须包含覆盖声明（数据范围、总消息量、抽样说明）。
 
-### Step 3f: 质量自检
+### Step 3j: 质量自检
 
 生成报告后，执行以下自检：
 
@@ -177,6 +219,7 @@ Evidence-based intimate relationship chat analysis.
 2. **风险词扫描**：检查是否使用了禁用词（肯定/一定/离不开/吃醋/PUA 等）
 3. **覆盖声明**：大数据分析是否说明了抽样量和时间窗口
 4. **Layer 完整性**：报告是否包含 Layer -1（行动卡）和 Layer 0-7
+5. **关系信号审计**：T1 覆盖、T4 越权、单因子断言、人格画像反证是否通过
 
 如发现违规，修正后再输出。
 
@@ -243,6 +286,7 @@ Evidence-based intimate relationship chat analysis.
 1. **关系行动卡**（Layer -1，报告第一屏，1 分钟内回答"我现在该怎么做"）
 2. 关系分析报告（Layer 0-7 完整结构）
 3. 不确定性说明（每个结论的置信度、反证、替代解释）
+4. 关系信号台账摘要与可靠性审计状态
 
 ### 可选输出（根据用户需求）
 3. 沟通教练（多语气回复）
