@@ -34,7 +34,13 @@ correction:
   source: user_observation | user_info | user_intuition
   confidence: high  # 用户纠正默认高置信度
   evidence_ids: [受影响的证据 ID]
+  signal_ledger_action: add | update | downgrade | rerun
 ```
+
+同时写入或更新：
+- `relationship_signal_ledger.jsonl`：用户纠正涉及的 T1/T2/T3 信号
+- `contradiction_ledger.md`：被纠正结论、反证和替代解释
+- `reliability_audit.md`：纠正后是否仍可交付
 
 ### 4. 检查冲突
 
@@ -42,6 +48,14 @@ correction:
 - 直接影响：同一 Layer 的相关结论
 - 间接影响：其他 Layer 的衍生结论
 - 级联影响：基于被纠正结论的建议
+- 台账影响：T1/T2 权重、当前阶段、多因子解释、行动卡
+
+如果用户纠正指出遗漏 T1 证据，必须重跑：
+1. `relationship_signal_extractor.md`
+2. `relationship_timeline_builder.md`
+3. `multi_factor_interpreter.md`
+4. `report_builder.md`
+5. `scripts/relationship_signal_audit.py`
 
 ### 5. 确认并写入
 
@@ -63,3 +77,5 @@ correction:
 2. **优先用户**：用户比数据更了解对方
 3. **降低置信度**：被纠正的结论及相关假设，置信度降低
 4. **记录学习**：将纠正写入 update_log，供后续分析参考
+5. **纠正入账**：用户纠正不是聊天备注，而是关系信号台账的一等输入
+6. **行动卡重算**：任何影响 T1/T2 的纠正都必须重新生成行动卡

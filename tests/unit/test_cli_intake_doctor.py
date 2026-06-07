@@ -191,3 +191,40 @@ def test_doctor_creates_readiness_md(cli_runner, tmp_path):
     assert "消息量" in content
     assert "时间跨度" in content
     assert "双方平衡" in content
+
+
+def test_doctor_warns_when_high_volume_lacks_t1(cli_runner, tmp_path):
+    """High message volume without T1 relationship signals is not enough for strong relationship claims."""
+    runner, app = cli_runner
+
+    from bondlens.schema import Message, SenderRole, MessageType, Modality
+    from datetime import datetime, timedelta
+    from bondlens.jsonl_utils import write_jsonl_models
+
+    messages = []
+    for i in range(120):
+        role = SenderRole.SELF if i % 2 == 0 else SenderRole.TARGET
+        messages.append(Message(
+            message_id=f"msg-{i}",
+            conversation_id="test-conv",
+            source_type="csv",
+            timestamp=datetime(2026, 1, 1) + timedelta(hours=i),
+            sender_role=role,
+            message_type=MessageType.TEXT,
+            modality=Modality.TEXT,
+            text=f"今天第 {i} 条日常闲聊",
+        ))
+
+    messages_path = tmp_path / "messages.jsonl"
+    write_jsonl_models(messages_path, messages)
+
+    result = runner.invoke(app, [
+        "doctor",
+        "--messages", str(messages_path),
+        "--out", str(tmp_path),
+    ])
+    assert result.exit_code == 0
+
+    content = (tmp_path / "data_readiness.md").read_text(encoding="utf-8")
+    assert "T1 关系信号" in content
+    assert "不足以判断关系性质" in content
