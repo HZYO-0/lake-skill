@@ -34,6 +34,7 @@ exports/
 private/
 real_data/
 chat_logs/
+analyses/
 voice/
 screenshots/
 transcripts/
