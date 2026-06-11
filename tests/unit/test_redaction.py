@@ -1,7 +1,7 @@
 """Tests for redaction."""
 
-from bondlens.privacy.modes import PrivacyMode
-from bondlens.privacy.redactor import create_redactor
+from lake_skill.privacy.modes import PrivacyMode
+from lake_skill.privacy.redactor import create_redactor
 
 
 def test_redact_phone_number():

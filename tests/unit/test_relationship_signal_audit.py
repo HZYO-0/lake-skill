@@ -1,4 +1,4 @@
-"""Regression tests for BondLens relationship signal reliability audit."""
+"""Regression tests for LakeSkill relationship signal reliability audit."""
 
 import importlib.util
 import json
@@ -11,7 +11,7 @@ ARTIFACT_ROOT = PROJECT_ROOT / "work" / "test-artifacts" / "relationship_signal_
 AUDIT_MODULE_PATH = PROJECT_ROOT / "scripts" / "relationship_signal_audit.py"
 
 _audit_spec = importlib.util.spec_from_file_location(
-    "bondlens_relationship_signal_audit", AUDIT_MODULE_PATH
+    "lakeskill_relationship_signal_audit", AUDIT_MODULE_PATH
 )
 assert _audit_spec is not None
 assert _audit_spec.loader is not None
@@ -55,7 +55,7 @@ def test_audit_passes_for_multifactor_report():
     """A report that cites T1 and includes counterevidence passes."""
     tmp_path = _case_dir("pass")
     ledger = tmp_path / "relationship_signal_ledger.jsonl"
-    report = tmp_path / "bondlens_report.md"
+    report = tmp_path / "lakeskill_report.md"
 
     _write_jsonl(
         ledger,
@@ -67,7 +67,7 @@ def test_audit_passes_for_multifactor_report():
     )
     report.write_text(
         """
-# BondLens 关系分析报告
+# LakeSkill 关系分析报告
 
 ## Layer 1.5: 关系信号台账摘要
 T1 条件性时间线：E-20260517-001。T2 修复信号：E-20260518-001。
@@ -94,7 +94,7 @@ def test_audit_flags_missing_t1_and_single_factor_assertion():
     """Missing T1 coverage and binary overclaim are audit failures."""
     tmp_path = _case_dir("missing-t1")
     ledger = tmp_path / "relationship_signal_ledger.jsonl"
-    report = tmp_path / "bondlens_report.md"
+    report = tmp_path / "lakeskill_report.md"
 
     _write_jsonl(
         ledger,
@@ -105,9 +105,9 @@ def test_audit_flags_missing_t1_and_single_factor_assertion():
     )
     report.write_text(
         """
-# BondLens 关系分析报告
+# LakeSkill 关系分析报告
 
-## Layer -1: 关系行动卡
+## Layer -1: 湖镜行动卡（关系行动卡）
 你们每天聊天很多（E-20260519-001），她就是不喜欢你。
 """,
         encoding="utf-8",
@@ -124,7 +124,7 @@ def test_audit_requires_persona_counterevidence_and_alternatives():
     """Persona/attachment evidence blocks must include counterevidence and alternatives."""
     tmp_path = _case_dir("persona-fields")
     ledger = tmp_path / "relationship_signal_ledger.jsonl"
-    report = tmp_path / "bondlens_report.md"
+    report = tmp_path / "lakeskill_report.md"
 
     _write_jsonl(
         ledger,
@@ -132,7 +132,7 @@ def test_audit_requires_persona_counterevidence_and_alternatives():
     )
     report.write_text(
         """
-# BondLens 关系分析报告
+# LakeSkill 关系分析报告
 
 ## Layer 2: 对方 人格画像
 ### 依恋信号
@@ -152,7 +152,7 @@ def test_audit_requires_user_correction_coverage():
     """User correction evidence must appear in both ledger and report."""
     tmp_path = _case_dir("correction")
     ledger = tmp_path / "relationship_signal_ledger.jsonl"
-    report = tmp_path / "bondlens_report.md"
+    report = tmp_path / "lakeskill_report.md"
     corrections = tmp_path / "corrections.jsonl"
 
     _write_jsonl(
@@ -165,7 +165,7 @@ def test_audit_requires_user_correction_coverage():
     )
     report.write_text(
         """
-# BondLens 关系分析报告
+# LakeSkill 关系分析报告
 E-20260517-001 已进入关系信号台账。
 """,
         encoding="utf-8",

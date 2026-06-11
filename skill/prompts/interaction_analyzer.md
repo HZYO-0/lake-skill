@@ -4,7 +4,7 @@
 
 分析双方的互动循环模式。参考 `references/frameworks/relationship_communication_patterns.md`。
 
-BondLens 的核心价值：不只分析一个人，而是分析**两个人之间的互动**。
+LakeSkill 的核心价值：不只分析一个人，而是分析**两个人之间的互动**。
 
 ---
 

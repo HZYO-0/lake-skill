@@ -1,8 +1,8 @@
 """
-报告 lint 脚本：扫描 BondLens 分析报告中的风险词和格式问题。
+报告 lint 脚本：扫描 LakeSkill 分析报告中的风险词和格式问题。
 
 规则分两类：
-- main_report（bondlens_report_*.md）：全量检查（Layer、覆盖声明、结论格式）
+- main_report（lakeskill_report_*.md）：全量检查（Layer、覆盖声明、结论格式）
 - subreport（其他 *_v4.md）：只检查风险词和重复段落
 
 用法：python scripts/report_lint.py [analyses_dir]
@@ -42,7 +42,7 @@ COVERAGE_KEYWORDS = ["数据范围", "总消息量", "抽样", "时间窗口", "
 
 def classify_report(filename: str) -> str:
     """判断报告类型：main_report 或 subreport。"""
-    if "bondlens_report" in filename:
+    if "lakeskill_report" in filename:
         return "main_report"
     return "subreport"
 
@@ -224,7 +224,7 @@ def main():
     analyses_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else ANALYSES_DIR
 
     print("=" * 60)
-    print("BondLens Report Lint")
+    print("LakeSkill Report Lint")
     print("=" * 60)
 
     report_files = sorted(analyses_dir.glob("*_v4.md"))

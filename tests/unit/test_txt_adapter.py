@@ -4,7 +4,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from bondlens.adapters.wechat_txt import WeChatTXTAdapter
+from lake_skill.adapters.wechat_txt import WeChatTXTAdapter
 
 
 def test_txt_adapter_basic():

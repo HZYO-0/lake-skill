@@ -2,7 +2,7 @@
 
 ## 任务
 
-从聊天记录中提取双方的人格信号。参考 colleague-skill 的 persona_analyzer，但适配 BondLens 的双方分析和证据方法论。
+从聊天记录中提取双方的人格信号。参考 colleague-skill 的 persona_analyzer，但适配 LakeSkill 的双方分析和证据方法论。
 
 **优先级规则：用户手动提供的信息 > 聊天记录分析。有冲突时以用户信息为准，并在输出中注明。**
 

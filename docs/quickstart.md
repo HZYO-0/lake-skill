@@ -1,6 +1,6 @@
-# BondLens Quickstart
+# LakeSkill Quickstart
 
-This guide shows three ways to run BondLens: quick paste, file upload, and privacy-first local preprocessing.
+This guide shows three ways to run LakeSkill: quick paste, file upload, and privacy-first local preprocessing.
 
 ---
 
@@ -9,7 +9,7 @@ This guide shows three ways to run BondLens: quick paste, file upload, and priva
 Use this when you want a fast first read.
 
 ```text
-使用 bondlens，帮我分析这段聊天记录。我的目标是知道下一步怎么做。
+使用 lake-skill，帮我分析这段聊天记录。我的目标是知道下一步怎么做。
 
 [2026-06-01 22:13] 我: ...
 [2026-06-01 22:14] 对方: ...
@@ -41,7 +41,7 @@ Supported inputs:
 Prompt:
 
 ```text
-使用 bondlens，帮我分析这个聊天记录文件。
+使用 lake-skill，帮我分析这个聊天记录文件。
 关系类型：暧昧/朋友/前任/伴侣/同事
 当前状态：最近有点冷淡，我想知道下一步怎么做
 ```
@@ -62,38 +62,38 @@ Use this when data is large or sensitive. Raw chat records stay local; you uploa
 Install CLI:
 
 ```bash
-git clone https://github.com/HZYO-0/bondlens.git
-cd bondlens
+git clone https://github.com/HZYO-0/lake-skill.git
+cd lake-skill
 pip install -e ".[dev]"
 ```
 
 Initialize a project:
 
 ```bash
-bondlens init ./my_project
+lake-skill init ./my_project
 cd my_project
 ```
 
 Put data under `input/`, then run one ingest command:
 
 ```bash
-bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+lake-skill ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
 ```
 
 For WeChat TXT:
 
 ```bash
-bondlens ingest --file input/chat.txt --type txt --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+lake-skill ingest --file input/chat.txt --type txt --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
 ```
 
 Then preprocess:
 
 ```bash
-bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
-bondlens segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
-bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
-bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
-bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
+lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
+lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
+lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
+lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+lake-skill export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
 ```
 
 Upload to the Skill:
@@ -106,7 +106,7 @@ Upload to the Skill:
 Optional knowledge base:
 
 ```bash
-bondlens kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
+lake-skill kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
 ```
 
 Upload `kb/*.md` when asking for incremental updates.
@@ -116,7 +116,7 @@ Upload `kb/*.md` when asking for incremental updates.
 ## What A Good First Prompt Looks Like
 
 ```text
-使用 bondlens，帮我分析我和 TA 的聊天记录。
+使用 lake-skill，帮我分析我和 TA 的聊天记录。
 
 关系类型：暧昧但未确认
 当前状态：最近对方回复变短，我担心自己踩雷
@@ -128,7 +128,7 @@ Upload `kb/*.md` when asking for incremental updates.
 
 ## Output Checklist
 
-A complete 0.9.0 report should include:
+A complete 0.10.0 report should include:
 
 - Relationship action card as the first screen
 - Coverage declaration

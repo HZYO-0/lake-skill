@@ -1,9 +1,9 @@
-# BondLens 关系镜 — Codex Review Document
+# LakeSkill 湖镜 — Codex Review Document
 
 ## 项目概述
 
-**名称**：BondLens 关系镜
-**版本**：0.9.0
+**名称**：LakeSkill 湖镜
+**版本**：0.10.0
 **类型**：ChatGPT/Claude Custom Skill + Python CLI 工具
 **定位**：基于证据的亲密关系沟通分析工具
 
@@ -22,7 +22,7 @@
 
 **模式 1：直接使用 Skill（推荐，3 分钟部署）**
 ```
-用户 → 安装 skills/bondlens 或创建 ChatGPT GPT → 粘贴 SKILL.md/上传框架文件 → 粘贴聊天记录 → 获得分析
+用户 → 安装 skills/lake-skill 或创建 ChatGPT GPT → 粘贴 SKILL.md/上传框架文件 → 粘贴聊天记录 → 获得分析
 ```
 
 **模式 2：CLI 预处理 + Skill 分析（增强隐私）**
@@ -40,17 +40,17 @@
 **模式 2（CLI 预处理）**：
 ```
 聊天记录（CSV/TXT/SQLite/SRT）
-    ↓ bondlens ingest
+    ↓ lake-skill ingest
 标准化消息（JSONL）
-    ↓ bondlens redact
+    ↓ lake-skill redact
 脱敏消息（JSONL）
-    ↓ bondlens segment
+    ↓ lake-skill segment
 会话切分（JSONL）
-    ↓ bondlens digest + bondlens evidence
+    ↓ lake-skill digest + lake-skill evidence
 摘要（MD）+ 证据索引（JSONL）
-    ↓ bondlens export --mode conversations
+    ↓ lake-skill export --mode conversations
 完整对话（JSONL，脱敏文本）
-    ↓ bondlens kb init
+    ↓ lake-skill kb init
 知识库（YAML/MD/JSONL）
     ↓ 上传到 ChatGPT/Claude
 AI 教练对话
@@ -134,15 +134,15 @@ Skill 会根据输入数据量决定分析深度：
 
 | 命令 | 功能 | 输入 | 输出 |
 |------|------|------|------|
-| `bondlens init` | 初始化项目 | 路径 | 目录结构 |
-| `bondlens ingest` | 导入聊天数据 | CSV/TXT/JSONL/SQLite/SRT/OCR | 标准化 JSONL |
-| `bondlens redact` | 隐私脱敏 | JSONL | 脱敏 JSONL |
-| `bondlens check-leaks` | 扫描隐私泄露 | 目录 | 报告 |
-| `bondlens segment` | 会话切分 | JSONL | 会话 JSONL |
-| `bondlens digest` | 生成摘要 | 消息+会话 | Markdown |
-| `bondlens evidence` | 生成证据索引 | 消息+会话 | JSONL |
-| `bondlens export` | 导出对话（3 种模式） | 消息+会话 | JSONL |
-| `bondlens kb init/patch` | 知识库管理 | 消息+会话+证据 | 目录/补丁 |
+| `lake-skill init` | 初始化项目 | 路径 | 目录结构 |
+| `lake-skill ingest` | 导入聊天数据 | CSV/TXT/JSONL/SQLite/SRT/OCR | 标准化 JSONL |
+| `lake-skill redact` | 隐私脱敏 | JSONL | 脱敏 JSONL |
+| `lake-skill check-leaks` | 扫描隐私泄露 | 目录 | 报告 |
+| `lake-skill segment` | 会话切分 | JSONL | 会话 JSONL |
+| `lake-skill digest` | 生成摘要 | 消息+会话 | Markdown |
+| `lake-skill evidence` | 生成证据索引 | 消息+会话 | JSONL |
+| `lake-skill export` | 导出对话（3 种模式） | 消息+会话 | JSONL |
+| `lake-skill kb init/patch` | 知识库管理 | 消息+会话+证据 | 目录/补丁 |
 
 ### 导出模式
 
@@ -212,14 +212,14 @@ tests/
 ### 方式 1：ChatGPT 自定义 GPT（推荐，3 分钟）
 
 1. 打开 ChatGPT → Create a GPT
-2. 粘贴 `skills/bondlens/SKILL.md` 到 Instructions
-3. 上传 `skills/bondlens/references/frameworks/` 下的 7 个文件到 Knowledge
+2. 粘贴 `skills/lake-skill/SKILL.md` 到 Instructions
+3. 上传 `skills/lake-skill/references/frameworks/` 下的 7 个文件到 Knowledge
 4. 直接粘贴聊天记录开始使用
 
 ### 方式 2：Claude Code / Claude Project
 
-- **Claude Project**：粘贴 `skills/bondlens/SKILL.md` 到 Instructions，上传框架文件到 Knowledge
-- **Claude Code**：用 `npx skills add HZYO-0/bondlens -y`，或复制 `skills/bondlens/` 到 `.claude/skills/bondlens/`
+- **Claude Project**：粘贴 `skills/lake-skill/SKILL.md` 到 Instructions，上传框架文件到 Knowledge
+- **Claude Code**：用 `npx skills add HZYO-0/lake-skill -y`，或复制 `skills/lake-skill/` 到 `.claude/skills/lake-skill/`
 
 ### 方式 3：Codex / OpenCode
 
@@ -227,25 +227,25 @@ Codex 可用内置安装器安装 GitHub 子目录：
 
 ```bash
 python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
-  --repo HZYO-0/bondlens \
-  --path skills/bondlens
+  --repo HZYO-0/lake-skill \
+  --path skills/lake-skill
 ```
 
-OpenCode 可复制 `skills/bondlens/` 到 `.opencode/skills/bondlens/`。
+OpenCode 可复制 `skills/lake-skill/` 到 `.opencode/skills/lake-skill/`。
 
 ### 方式 4：CLI 本地预处理 + Skill（增强隐私）
 
 ```bash
-git clone https://github.com/HZYO-0/bondlens.git && cd bondlens
+git clone https://github.com/HZYO-0/lake-skill.git && cd lake-skill
 pip install -e ".[dev]"
-bondlens init ./my-project && cd my-project
-bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方
-bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl
-bondlens segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
-bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
-bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
-bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
-bondlens kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
+lake-skill init ./my-project && cd my-project
+lake-skill ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方
+lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl
+lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
+lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
+lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+lake-skill export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
+lake-skill kb init --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --evidence work/evidence.redacted.jsonl --out kb/
 # 把 work/ 和 kb/ 中的文件上传到 ChatGPT/Claude
 ```
 
@@ -294,7 +294,7 @@ bondlens kb init --messages work/messages.redacted.jsonl --sessions work/session
 ## 状态
 
 - CLI 完整可用（9 个命令，26 个测试全部通过）
-- Skill 定义完整（`skills/bondlens/SKILL.md` + 7 个框架 + 首次校准向导 + 教练对话模式）
+- Skill 定义完整（`skills/lake-skill/SKILL.md` + 7 个框架 + 首次校准向导 + 教练对话模式）
 - 文档完整（README + INSTALL.md + chat_record_preparation.md + privacy_model + platform_compatibility + codex_setup）
 - 多平台安装支持（ChatGPT/Claude/Codex/OpenCode/OpenClaw/Agents）
 - CI/CD 配置完成（4 个 workflow，隐私扫描和网络调用扫描为阻断项）

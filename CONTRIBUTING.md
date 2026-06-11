@@ -1,4 +1,4 @@
-# Contributing to BondLens 关系镜
+# Contributing to LakeSkill 湖镜
 
 Thank you for your interest in contributing!
 

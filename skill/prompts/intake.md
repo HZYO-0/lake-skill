@@ -1,6 +1,6 @@
-<!-- DEPRECATED: canonical source is skills/bondlens/prompts/intake.md -->
+<!-- DEPRECATED: canonical source is skills/lake-skill/prompts/intake.md -->
 
-# BondLens 信息收集 Prompt
+# LakeSkill 信息收集 Prompt
 
 ## 目标
 

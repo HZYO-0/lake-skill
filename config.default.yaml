@@ -1,5 +1,5 @@
 project:
-  name: bondlens
+  name: lake-skill
   default_relationship_type: ambiguous
   timezone: Asia/Shanghai
 

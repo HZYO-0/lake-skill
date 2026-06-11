@@ -1,5 +1,5 @@
 """
-BondLens 关系信号可靠性审计。
+LakeSkill 关系信号可靠性审计。
 
 检查项：
 1. relationship_signal_ledger.jsonl 中 T1 信号是否被主报告引用。
@@ -253,15 +253,15 @@ def audit_paths(
 
 
 def default_report_path(analyses_dir: Path) -> Path:
-    """Choose the main BondLens report in an analysis directory."""
-    candidates = sorted(analyses_dir.glob("bondlens_report*.md"))
+    """Choose the main LakeSkill report in an analysis directory."""
+    candidates = sorted(analyses_dir.glob("lakeskill_report*.md"))
     if candidates:
         return candidates[0]
-    return analyses_dir / "bondlens_report.md"
+    return analyses_dir / "lakeskill_report.md"
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit BondLens relationship signal reliability.")
+    parser = argparse.ArgumentParser(description="Audit LakeSkill relationship signal reliability.")
     parser.add_argument("analyses_dir", nargs="?", default=str(ANALYSES_DIR))
     parser.add_argument("--ledger", type=Path, default=None)
     parser.add_argument("--report", type=Path, default=None)
@@ -279,7 +279,7 @@ def main(argv: list[str] | None = None) -> int:
         correction_paths = [analyses_dir / name for name in CORRECTION_FILENAMES]
 
     print("=" * 60)
-    print("BondLens Relationship Signal Audit")
+    print("LakeSkill Relationship Signal Audit")
     print("=" * 60)
     print(f"Ledger: {ledger_path}")
     print(f"Report: {report_path}")

@@ -1,4 +1,4 @@
-"""Tests for bondlens intake and doctor CLI commands."""
+"""Tests for lake-skill intake and doctor CLI commands."""
 
 import pytest
 
@@ -15,12 +15,12 @@ def _check_cli_deps() -> None:
 def cli_runner():
     _check_cli_deps()
     from typer.testing import CliRunner
-    from bondlens.cli import app
+    from lake_skill.cli import app
     return CliRunner(), app
 
 
 def test_intake_generates_yaml_and_md(cli_runner, tmp_path):
-    """bondlens intake creates both YAML and MD files."""
+    """lake-skill intake creates both YAML and MD files."""
     runner, app = cli_runner
     result = runner.invoke(app, [
         "intake",
@@ -32,12 +32,12 @@ def test_intake_generates_yaml_and_md(cli_runner, tmp_path):
         "--work-mode", "practical",
     ])
     assert result.exit_code == 0
-    assert (tmp_path / "bondlens_intake.yaml").exists()
-    assert (tmp_path / "bondlens_intake.md").exists()
+    assert (tmp_path / "lakeskill_intake.yaml").exists()
+    assert (tmp_path / "lakeskill_intake.md").exists()
 
 
 def test_intake_invalid_work_mode_fails(cli_runner, tmp_path):
-    """bondlens intake rejects invalid work mode."""
+    """lake-skill intake rejects invalid work mode."""
     runner, app = cli_runner
     result = runner.invoke(app, [
         "intake",
@@ -59,10 +59,10 @@ def test_intake_yaml_loads_back(cli_runner, tmp_path):
     ])
     assert result.exit_code == 0
 
-    from bondlens.intake_io import load_intake_yaml
-    from bondlens.schema import IntakeCard, WorkMode
+    from lake_skill.intake_io import load_intake_yaml
+    from lake_skill.schema import IntakeCard, WorkMode
 
-    card = load_intake_yaml(tmp_path / "bondlens_intake.yaml")
+    card = load_intake_yaml(tmp_path / "lakeskill_intake.yaml")
     assert isinstance(card, IntakeCard)
     assert card.relationship_type == "暧昧"
     assert card.status == "冷淡期"
@@ -79,17 +79,17 @@ def test_intake_md_contains_work_mode(cli_runner, tmp_path):
     ])
     assert result.exit_code == 0
 
-    content = (tmp_path / "bondlens_intake.md").read_text(encoding="utf-8")
+    content = (tmp_path / "lakeskill_intake.md").read_text(encoding="utf-8")
     assert "support" in content
 
 
 def test_doctor_with_sufficient_data(cli_runner, tmp_path):
-    """bondlens doctor reports OK for 100+ message dataset."""
+    """lake-skill doctor reports OK for 100+ message dataset."""
     runner, app = cli_runner
 
-    from bondlens.schema import Message, SenderRole, MessageType, Modality
+    from lake_skill.schema import Message, SenderRole, MessageType, Modality
     from datetime import datetime, timedelta
-    from bondlens.jsonl_utils import write_jsonl_models
+    from lake_skill.jsonl_utils import write_jsonl_models
 
     messages = []
     for i in range(120):
@@ -118,12 +118,12 @@ def test_doctor_with_sufficient_data(cli_runner, tmp_path):
 
 
 def test_doctor_with_sparse_data(cli_runner, tmp_path):
-    """bondlens doctor warns on < 30 messages."""
+    """lake-skill doctor warns on < 30 messages."""
     runner, app = cli_runner
 
-    from bondlens.schema import Message, SenderRole, MessageType, Modality
+    from lake_skill.schema import Message, SenderRole, MessageType, Modality
     from datetime import datetime, timedelta
-    from bondlens.jsonl_utils import write_jsonl_models
+    from lake_skill.jsonl_utils import write_jsonl_models
 
     messages = []
     for i in range(10):
@@ -155,12 +155,12 @@ def test_doctor_with_sparse_data(cli_runner, tmp_path):
 
 
 def test_doctor_creates_readiness_md(cli_runner, tmp_path):
-    """bondlens doctor outputs data_readiness.md with proper structure."""
+    """lake-skill doctor outputs data_readiness.md with proper structure."""
     runner, app = cli_runner
 
-    from bondlens.schema import Message, SenderRole, MessageType, Modality
+    from lake_skill.schema import Message, SenderRole, MessageType, Modality
     from datetime import datetime, timedelta
-    from bondlens.jsonl_utils import write_jsonl_models
+    from lake_skill.jsonl_utils import write_jsonl_models
 
     messages = []
     for i in range(50):
@@ -187,7 +187,7 @@ def test_doctor_creates_readiness_md(cli_runner, tmp_path):
     assert result.exit_code == 0
 
     content = (tmp_path / "data_readiness.md").read_text(encoding="utf-8")
-    assert "BondLens Data Readiness Report" in content
+    assert "LakeSkill Data Readiness Report" in content
     assert "消息量" in content
     assert "时间跨度" in content
     assert "双方平衡" in content
@@ -197,9 +197,9 @@ def test_doctor_warns_when_high_volume_lacks_t1(cli_runner, tmp_path):
     """High message volume without T1 relationship signals is not enough for strong relationship claims."""
     runner, app = cli_runner
 
-    from bondlens.schema import Message, SenderRole, MessageType, Modality
+    from lake_skill.schema import Message, SenderRole, MessageType, Modality
     from datetime import datetime, timedelta
-    from bondlens.jsonl_utils import write_jsonl_models
+    from lake_skill.jsonl_utils import write_jsonl_models
 
     messages = []
     for i in range(120):

@@ -1,9 +1,9 @@
 # Platform Compatibility
 
-BondLens uses one canonical installable package:
+LakeSkill uses one canonical installable package:
 
 ```text
-skills/bondlens/
+skills/lake-skill/
 ```
 
 That folder contains `SKILL.md`, framework references, knowledge-base templates, and optional agent metadata. The repository root is for development and CLI tooling.
@@ -13,13 +13,13 @@ That folder contains `SKILL.md`, framework references, knowledge-base templates,
 Use AgentSkills-compatible installation when available:
 
 ```bash
-npx skills add HZYO-0/bondlens -y
+npx skills add HZYO-0/lake-skill -y
 ```
 
 To preview what the repository exposes:
 
 ```bash
-npx skills add HZYO-0/bondlens --list
+npx skills add HZYO-0/lake-skill --list
 ```
 
 ## Codex
@@ -28,8 +28,8 @@ Codex can install the GitHub subdirectory directly:
 
 ```bash
 python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
-  --repo HZYO-0/bondlens \
-  --path skills/bondlens
+  --repo HZYO-0/lake-skill \
+  --path skills/lake-skill
 ```
 
 Restart Codex after installation.
@@ -37,41 +37,41 @@ Restart Codex after installation.
 ## ChatGPT Custom GPT
 
 1. Create a GPT.
-2. Paste `skills/bondlens/SKILL.md` into **Instructions**.
-3. Upload all files from `skills/bondlens/references/frameworks/` to **Knowledge**.
+2. Paste `skills/lake-skill/SKILL.md` into **Instructions**.
+3. Upload all files from `skills/lake-skill/references/frameworks/` to **Knowledge**.
 4. Paste or upload representative chat records.
 
 ## Claude Project
 
 Use the same ChatGPT-style paste/upload model:
 
-1. Paste `skills/bondlens/SKILL.md` into the project instructions.
-2. Upload `skills/bondlens/references/frameworks/*.md` as project knowledge.
+1. Paste `skills/lake-skill/SKILL.md` into the project instructions.
+2. Upload `skills/lake-skill/references/frameworks/*.md` as project knowledge.
 
 ## Manual Copy Paths
 
-Copy `skills/bondlens/` into the target runtime path:
+Copy `skills/lake-skill/` into the target runtime path:
 
 | Platform | Destination |
 |---|---|
-| Claude Code project | `.claude/skills/bondlens/` |
-| Claude Code global | `~/.claude/skills/bondlens/` |
-| Codex project | `.codex/skills/bondlens/` |
-| OpenCode project | `.opencode/skills/bondlens/` |
-| OpenClaw global | `~/.openclaw/workspace/skills/bondlens/` |
-| Agents project | `.agents/skills/bondlens/` |
+| Claude Code project | `.claude/skills/lake-skill/` |
+| Claude Code global | `~/.claude/skills/lake-skill/` |
+| Codex project | `.codex/skills/lake-skill/` |
+| OpenCode project | `.opencode/skills/lake-skill/` |
+| OpenClaw global | `~/.openclaw/workspace/skills/lake-skill/` |
+| Agents project | `.agents/skills/lake-skill/` |
 
 Example:
 
 ```bash
 mkdir -p .claude/skills
-cp -r skills/bondlens .claude/skills/bondlens
+cp -r skills/lake-skill .claude/skills/lake-skill
 ```
 
 ## Package Layout
 
 ```text
-skills/bondlens/
+skills/lake-skill/
 ├── SKILL.md
 ├── agents/openai.yaml
 ├── references/frameworks/

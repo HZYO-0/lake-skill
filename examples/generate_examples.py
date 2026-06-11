@@ -7,13 +7,13 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from bondlens.adapters.generic_csv import GenericCSVAdapter
-from bondlens.privacy.redactor import create_redactor
-from bondlens.privacy.modes import PrivacyMode
-from bondlens.segmentation.sessionizer import segment_sessions
-from bondlens.evidence.indexer import index_evidence
-from bondlens.reports.digest import generate_digest
-from bondlens.schema import Message
+from lake_skill.adapters.generic_csv import GenericCSVAdapter
+from lake_skill.privacy.redactor import create_redactor
+from lake_skill.privacy.modes import PrivacyMode
+from lake_skill.segmentation.sessionizer import segment_sessions
+from lake_skill.evidence.indexer import index_evidence
+from lake_skill.reports.digest import generate_digest
+from lake_skill.schema import Message
 
 
 def main():

@@ -2,7 +2,7 @@
 
 ## 任务
 
-综合所有分析结果，生成完整的关系分析报告。对标 colleague-skill 的 persona_builder，但适配 BondLens 的双方分析和证据方法论。
+综合所有分析结果，生成完整的关系分析报告。对标 colleague-skill 的 persona_builder，但适配 LakeSkill 的双方分析和证据方法论。
 
 **最重要的是具体感——读起来就像在描述你们两个人的真实互动，而不是泛泛的人格描述。**
 

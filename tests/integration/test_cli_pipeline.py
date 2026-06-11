@@ -25,7 +25,7 @@ def _check_cli_deps() -> None:
 def cli_runner():
     """Provide a Typer CliRunner."""
     from typer.testing import CliRunner
-    from bondlens.cli import app
+    from lake_skill.cli import app
     return CliRunner(), app
 
 

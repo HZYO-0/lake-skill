@@ -8,5 +8,5 @@ def test_simple():
 
 def test_import():
     """Test that imports work."""
-    from bondlens.schema import Message
+    from lake_skill.schema import Message
     assert Message is not None

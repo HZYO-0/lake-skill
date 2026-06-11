@@ -1,12 +1,12 @@
-"""Package the canonical BondLens skill for multiple platforms.
+"""Package the canonical LakeSkill skill for multiple platforms.
 
 Generates platform-specific installation packages in dist/:
   - chatgpt/       : SKILL.md + frameworks (for GPT Knowledge upload)
-  - claude/        : .claude/skills/bondlens/
-  - codex/         : .codex/skills/bondlens/
-  - opencode/      : .opencode/skills/bondlens/
-  - openclaw/      : .openclaw/workspace/skills/bondlens/
-  - agents/        : .agents/skills/bondlens/
+  - claude/        : .claude/skills/lake-skill/
+  - codex/         : .codex/skills/lake-skill/
+  - opencode/      : .opencode/skills/lake-skill/
+  - openclaw/      : .openclaw/workspace/skills/lake-skill/
+  - agents/        : .agents/skills/lake-skill/
 
 Usage:
     python tools/package_skill.py
@@ -18,7 +18,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = PROJECT_ROOT / "dist"
-SKILL_PACKAGE_DIR = PROJECT_ROOT / "skills" / "bondlens"
+SKILL_PACKAGE_DIR = PROJECT_ROOT / "skills" / "lake-skill"
 FRAMEWORKS_DIR = SKILL_PACKAGE_DIR / "references" / "frameworks"
 
 FRAMEWORKS = [
@@ -35,12 +35,16 @@ FRAMEWORKS = [
 def clean_dist() -> None:
     """Remove existing dist directory."""
     if DIST_DIR.exists():
-        shutil.rmtree(DIST_DIR)
-    DIST_DIR.mkdir(parents=True)
+        try:
+            shutil.rmtree(DIST_DIR)
+        except PermissionError as exc:
+            print(f"Warning: could not remove existing dist directory: {exc}", file=sys.stderr)
+            print("Continuing and overwriting LakeSkill package outputs in place.", file=sys.stderr)
+    DIST_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def copy_skill_package(out: Path) -> None:
-    """Copy the installable BondLens skill package into a platform directory."""
+    """Copy the installable LakeSkill skill package into a platform directory."""
     out.mkdir(parents=True)
     shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
 
@@ -53,12 +57,12 @@ def copy_skill_package(out: Path) -> None:
 def package_chatgpt() -> None:
     """Package for ChatGPT Custom GPT (flat structure for upload)."""
     out = DIST_DIR / "chatgpt"
-    out.mkdir()
+    out.mkdir(exist_ok=True)
 
     shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
 
     fw_out = out / "frameworks"
-    fw_out.mkdir()
+    fw_out.mkdir(exist_ok=True)
     for fw in FRAMEWORKS:
         src = FRAMEWORKS_DIR / fw
         if src.exists():
@@ -72,7 +76,7 @@ def package_chatgpt() -> None:
         "4. Start by pasting chat records or saying \"帮我分析一下我们的聊天记录\"\n\n"
         "## Test prompts\n\n"
         "- **Sparse test**: Paste 5-10 messages -> should say data insufficient\n"
-        "- **Full test**: Paste 50+ messages from multiple sessions -> should produce 8-item analysis\n",
+        "- **Full test**: Paste 50+ messages from multiple sessions -> should produce a 9-layer report\n",
         encoding="utf-8",
     )
     print(f"  chatgpt/ ({len(list(out.rglob('*')))} files)")
@@ -105,27 +109,27 @@ def main() -> int:
     package_chatgpt()
     package_platform(
         "claude",
-        ".claude/skills/bondlens",
+        ".claude/skills/lake-skill",
         "cp -r dist/claude/.claude/ ./.claude/",
     )
     package_platform(
         "codex",
-        ".codex/skills/bondlens",
+        ".codex/skills/lake-skill",
         "cp -r dist/codex/.codex/ ./.codex/",
     )
     package_platform(
         "opencode",
-        ".opencode/skills/bondlens",
+        ".opencode/skills/lake-skill",
         "cp -r dist/opencode/.opencode/ ./.opencode/",
     )
     package_platform(
         "openclaw",
-        ".openclaw/workspace/skills/bondlens",
+        ".openclaw/workspace/skills/lake-skill",
         "cp -r dist/openclaw/.openclaw/ ~/.openclaw/",
     )
     package_platform(
         "agents",
-        ".agents/skills/bondlens",
+        ".agents/skills/lake-skill",
         "cp -r dist/agents/.agents/ ./.agents/",
     )
 

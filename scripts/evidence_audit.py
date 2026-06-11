@@ -1,5 +1,5 @@
 """
-证据审计脚本：校验 BondLens 分析报告中的证据完整性。
+证据审计脚本：校验 LakeSkill 分析报告中的证据完整性。
 
 检查项：
 1. 每条结论是否包含 evidence_id / confidence / alternative_explanation
@@ -143,7 +143,7 @@ def main():
     index_path = analyses_dir / "evidence_index.jsonl"
 
     print("=" * 60)
-    print("BondLens 证据审计")
+    print("LakeSkill 证据审计")
     print("=" * 60)
 
     # 1. 加载并校验 evidence_index.jsonl

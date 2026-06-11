@@ -4,7 +4,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from bondlens.adapters.wechat_sqlite import WeChatSQLiteAdapter
+from lake_skill.adapters.wechat_sqlite import WeChatSQLiteAdapter
 
 
 def test_encrypted_database_error():

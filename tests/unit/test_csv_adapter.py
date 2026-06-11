@@ -4,7 +4,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from bondlens.adapters.generic_csv import GenericCSVAdapter
+from lake_skill.adapters.generic_csv import GenericCSVAdapter
 
 
 def test_csv_adapter_basic():

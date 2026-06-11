@@ -16,7 +16,7 @@ jobs:
       run: mkdir -p dist
 
     - name: Package skill
-      run: cd skills/bondlens && zip -r ../../dist/skill.zip . -x "*.pyc" -x "__pycache__/*"
+      run: cd skills/lake-skill && zip -r ../../dist/skill.zip . -x "*.pyc" -x "__pycache__/*"
 
     - name: Upload skill artifact
       uses: actions/upload-artifact@v4

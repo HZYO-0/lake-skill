@@ -1,0 +1,5 @@
+interface:
+  display_name: LakeSkill 湖镜
+  short_description: A calm relationship mirror for chat evidence, action cards, reliability audits, and message drafts.
+  icon: chat
+  brand_color: "#8EC5D8"

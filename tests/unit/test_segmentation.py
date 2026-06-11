@@ -2,8 +2,8 @@
 
 from datetime import datetime, timedelta
 
-from bondlens.schema import Message, SenderRole, MessageType, Modality
-from bondlens.segmentation.sessionizer import segment_sessions
+from lake_skill.schema import Message, SenderRole, MessageType, Modality
+from lake_skill.segmentation.sessionizer import segment_sessions
 
 
 def create_message(minutes_offset: int, sender: str = "target") -> Message:

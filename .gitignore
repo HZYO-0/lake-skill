@@ -64,4 +64,5 @@ examples/model_outputs/*.md
 
 # generated local agent installs
 .claude/
+.codex/
 .opencode/

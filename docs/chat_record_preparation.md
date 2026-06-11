@@ -1,6 +1,6 @@
 # Chat Record Preparation Guide
 
-BondLens is only as good as the relationship evidence you provide. The goal is not to upload the largest possible archive; the goal is to provide enough representative scenes for the Skill to distinguish a one-off moment from a repeated pattern.
+LakeSkill is only as good as the relationship evidence you provide. The goal is not to upload the largest possible archive; the goal is to provide enough representative scenes for the Skill to distinguish a one-off moment from a repeated pattern.
 
 ---
 
@@ -13,7 +13,7 @@ BondLens is only as good as the relationship evidence you provide. The goal is n
 | Useful action card | 100+ messages across several days | Decide what to do this week |
 | Full relationship report | Several weeks or months | Build profiles, interaction loops, playbook, uncertainty layer |
 
-If you only provide a short excerpt, BondLens should mark conclusions as low confidence and avoid stable personality or attachment claims.
+If you only provide a short excerpt, LakeSkill should mark conclusions as low confidence and avoid stable personality or attachment claims.
 
 ---
 
@@ -43,7 +43,7 @@ For a first full report, aim for at least 3-5 scene types.
 Fastest path for testing.
 
 ```text
-以下是我和某人的聊天记录，请用 BondLens 分析：
+以下是我和某人的聊天记录，请用 LakeSkill 分析：
 
 2026-06-01 22:13 我: 今天有点不知道怎么接她的话
 2026-06-01 22:14 对方: ...
@@ -71,12 +71,12 @@ CSV should include timestamp, sender, and content columns. TXT should preserve t
 Use this for privacy-sensitive or large datasets. Raw data stays local; only redacted artifacts are uploaded.
 
 ```bash
-bondlens ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
-bondlens redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
-bondlens segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
-bondlens digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
-bondlens evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
-bondlens export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
+lake-skill ingest --file input/chat.csv --type csv --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
+lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
+lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
+lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+lake-skill export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
 ```
 
 Upload:
@@ -108,7 +108,7 @@ This prevents the agent from guessing the relationship context.
 
 ## Privacy And Safety
 
-Do not upload data you do not have permission to use. BondLens does not decrypt databases, bypass access controls, or infer hidden intent with certainty.
+Do not upload data you do not have permission to use. LakeSkill does not decrypt databases, bypass access controls, or infer hidden intent with certainty.
 
 Before uploading to a cloud model, consider removing:
 

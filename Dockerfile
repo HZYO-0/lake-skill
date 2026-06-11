@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 # Copy project files
 COPY pyproject.toml .
 COPY cli/ cli/
-COPY skill/ skill/
+COPY skills/ skills/
 COPY config.default.yaml .
 
 # Install Python dependencies
@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -e .
 RUN mkdir -p input work kb reports examples
 
 # Set entrypoint
-ENTRYPOINT ["bondlens"]
+ENTRYPOINT ["lake-skill"]
 
 # Default command
 CMD ["--help"]

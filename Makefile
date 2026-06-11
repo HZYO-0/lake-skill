@@ -21,7 +21,7 @@ typecheck:  ## Run type checker
 check: lint typecheck test  ## Run all checks
 
 package-skill:  ## Package skill for ChatGPT
-	cd skills/bondlens && zip -r ../../dist/skill.zip . -x "*.pyc" -x "__pycache__/*"
+	cd skills/lake-skill && zip -r ../../dist/skill.zip . -x "*.pyc" -x "__pycache__/*"
 
 clean:  ## Clean build artifacts
 	rm -rf dist/ build/ *.egg-info
@@ -29,10 +29,10 @@ clean:  ## Clean build artifacts
 	find . -type f -name "*.pyc" -delete
 
 intake:  ## Generate intake card
-	bondlens intake --out .
+	lake-skill intake --out .
 
 doctor:  ## Run data readiness check
-	bondlens doctor --messages work/raw_messages.jsonl --out .
+	lake-skill doctor --messages work/raw_messages.jsonl --out .
 
 demo:  ## Generate demo package
 	cd examples/demo && python generate_demo.py

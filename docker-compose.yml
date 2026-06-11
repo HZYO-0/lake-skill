@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  bondlens:
+  lake-skill:
     build: .
     volumes:
       - ./input:/app/input
