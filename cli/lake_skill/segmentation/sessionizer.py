@@ -24,6 +24,9 @@ def segment_sessions(
     if not messages:
         return []
 
+    # Ensure messages are sorted by timestamp
+    messages = sorted(messages, key=lambda m: m.timestamp)
+
     sessions: list[Session] = []
     current_session_messages: list[Message] = []
     session_start: Optional[datetime] = None

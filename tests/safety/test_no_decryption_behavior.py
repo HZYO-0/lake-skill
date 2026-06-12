@@ -22,4 +22,5 @@ def test_encrypted_database_error():
 
         # Should raise error about unreadable database
         error_msg = str(exc_info.value).lower()
-        assert "encrypted" in error_msg or "not readable" in error_msg or "database" in error_msg
+        assert any(kw in error_msg for kw in ["encrypted", "not readable", "malformed", "disk image", "not a database"]), \
+            f"Expected encryption/readability error, got: {exc_info.value}"

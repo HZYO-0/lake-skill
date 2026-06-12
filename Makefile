@@ -25,8 +25,8 @@ package-skill:  ## Package skill for ChatGPT
 
 clean:  ## Clean build artifacts
 	rm -rf dist/ build/ *.egg-info
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
+	python -c "import shutil, pathlib; [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
+	python -c "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.pyc')]"
 
 intake:  ## Generate intake card
 	lake-skill intake --out .
@@ -35,4 +35,4 @@ doctor:  ## Run data readiness check
 	lake-skill doctor --messages work/raw_messages.jsonl --out .
 
 demo:  ## Generate demo package
-	cd examples/demo && python generate_demo.py
+	cd examples && python generate_examples.py

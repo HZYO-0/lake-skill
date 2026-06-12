@@ -6,6 +6,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from . import __version__
+
 
 class SenderRole(str, Enum):
     """Sender role enum."""
@@ -172,4 +174,4 @@ class IntakeCard(BaseModel):
     work_mode: WorkMode = WorkMode.AUTO
     scene_summary: str = ""
     created_at: datetime = Field(default_factory=datetime.now)
-    version: str = "0.10.0"
+    version: str = __version__

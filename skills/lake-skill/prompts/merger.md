@@ -52,10 +52,10 @@ patch:
 
 ### 5. 用户确认后应用
 
-用户确认 → 应用 Patch → 更新版本号（当前基线：0.10.0）→ 记录 update_log.md
+用户确认 → 应用 Patch → 更新版本号（参见 SKILL.md frontmatter version）→ 记录 update_log.md
 
 ## 版本管理
 
-- 每次合并按发布策略更新版本号（当前基线：0.10.0）
-- 重大修正按发布策略更新版本号（当前基线：0.10.0）
+- 每次合并按发布策略更新版本号（参见 SKILL.md frontmatter version）
+- 重大修正按发布策略更新版本号（参见 SKILL.md frontmatter version）
 - 更新记录写入 update_log.md

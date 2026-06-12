@@ -4,7 +4,7 @@
 import json
 from pathlib import Path
 
-ANALYSES_DIR = Path("F:/WeChat Relationship Insight/analyses/zy-tf")
+ANALYSES_DIR = Path(__file__).resolve().parents[1] / "analyses" / "zy-tf"
 OUTPUT = ANALYSES_DIR / "evidence_index.jsonl"
 
 # 手工整理的证据索引（从 v4 报告中提取）

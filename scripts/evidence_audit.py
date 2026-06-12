@@ -20,7 +20,7 @@ ANALYSES_DIR = Path(__file__).resolve().parents[1] / "analyses" / "zy-tf"
 REQUIRED_FIELDS = ["evidence_id", "date", "speaker", "raw_quote", "context",
                    "claim_tags", "confidence", "source_file", "analysis_version"]
 VALID_CONFIDENCE = {"low", "medium", "high"}
-VALID_SPEAKER = {"Tf", "Zy"}
+VALID_SPEAKER = set()  # populated from args or evidence data
 
 
 def load_evidence_index(index_path: Path) -> dict[str, dict]:
@@ -58,7 +58,7 @@ def validate_index_records(index: dict[str, dict]) -> list[str]:
             errors.append(f"  [{eid}] confidence 值非法: {conf} (合法值: {VALID_CONFIDENCE})")
         # 检查 speaker 合法性
         speaker = rec.get("speaker")
-        if speaker and speaker not in VALID_SPEAKER:
+        if speaker and VALID_SPEAKER and speaker not in VALID_SPEAKER:
             errors.append(f"  [{eid}] speaker 值非法: {speaker} (合法值: {VALID_SPEAKER})")
         # 检查 claim_tags 非空
         tags = rec.get("claim_tags")
@@ -150,6 +150,10 @@ def main():
     print(f"\n[1] 校验 evidence_index.jsonl: {index_path}")
     index = load_evidence_index(index_path)
     print(f"    加载 {len(index)} 条证据记录")
+
+    # 收集合法 speaker 值
+    global VALID_SPEAKER
+    VALID_SPEAKER = {rec.get("speaker") for rec in index.values() if rec.get("speaker")}
 
     schema_errors = validate_index_records(index)
     if schema_errors:

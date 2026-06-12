@@ -1,26 +1,27 @@
 """Redactor for sensitive information."""
 
 import re
+from typing import Optional
 
 from .modes import PrivacyConfig, PrivacyMode
 
 
 # Patterns for sensitive information
 PATTERNS = {
-    # Phone numbers (Chinese)
-    "phone": re.compile(r"1[3-9]\d{9}"),
-    # ID card (Chinese)
-    "id_card": re.compile(r"[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]"),
+    # Phone numbers (Chinese mobile: 1[3-9]X XXXX XXXX)
+    "phone": re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)"),
+    # ID card (Chinese 18-digit)
+    "id_card": re.compile(r"(?<!\d)[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx](?!\d)"),
     # Email
     "email": re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"),
     # WeChat ID (alphanumeric, 6-20 chars)
     "wechat_id": re.compile(r"wxid_[a-zA-Z0-9_]{6,20}"),
-    # Bank card (16-19 digits)
-    "bank_card": re.compile(r"\d{16,19}"),
+    # Bank card (16-19 digits, word boundary protected)
+    "bank_card": re.compile(r"(?<!\d)\d{16,19}(?!\d)"),
     # IP address
-    "ip_address": re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"),
-    # Latitude/Longitude
-    "coordinates": re.compile(r"[+-]?\d+\.\d{4,}"),
+    "ip_address": re.compile(r"(?<!\d)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?!\d)"),
+    # Latitude/Longitude (2-3 digits . 6+ decimal places, or with degree符号)
+    "coordinates": re.compile(r"[+-]?\d{1,3}\.\d{6,}"),
 }
 
 # Replacement markers
@@ -42,13 +43,19 @@ REPLACEMENTS = {
 class Redactor:
     """Redact sensitive information from text."""
 
-    def __init__(self, config: PrivacyConfig) -> None:
+    def __init__(self, config: PrivacyConfig, known_names: Optional[list[str]] = None) -> None:
         """Initialize redactor with privacy config.
 
         Args:
             config: Privacy configuration
+            known_names: List of known names to redact (e.g., from intake)
         """
         self.config = config
+        self.known_names = known_names or []
+        self._name_pattern: Optional[re.Pattern] = None
+        if self.known_names:
+            escaped = [re.escape(n) for n in sorted(self.known_names, key=len, reverse=True)]
+            self._name_pattern = re.compile("|".join(escaped))
 
     def redact_text(self, text: str, field_name: str = "text") -> str:
         """Redact sensitive information from text.
@@ -78,6 +85,10 @@ class Redactor:
         if self.config.redact_locations:
             result = self._redact_pattern(result, "ip_address")
             result = self._redact_pattern(result, "coordinates")
+
+        # Redact known names in text
+        if self.config.redact_names and self._name_pattern:
+            result = self._name_pattern.sub("[NAME]", result)
 
         return result
 
@@ -126,15 +137,16 @@ class Redactor:
         return result
 
 
-def create_redactor(mode: PrivacyMode) -> Redactor:
+def create_redactor(mode: PrivacyMode, known_names: Optional[list[str]] = None) -> Redactor:
     """Create a redactor for the specified privacy mode.
 
     Args:
         mode: Privacy mode
+        known_names: List of known names to redact
 
     Returns:
         Redactor instance
     """
     from .modes import get_privacy_config
     config = get_privacy_config(mode)
-    return Redactor(config)
+    return Redactor(config, known_names=known_names)

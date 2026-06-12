@@ -130,12 +130,20 @@ class WeChatSQLiteAdapter(BaseAdapter):
 
         # Build query
         columns = [timestamp_col, text_col]
+        col_index = {"timestamp": 0, "text": 1}
+        next_idx = 2
         if sender_col:
             columns.append(sender_col)
+            col_index["sender"] = next_idx
+            next_idx += 1
         if msg_type_col:
             columns.append(msg_type_col)
+            col_index["msg_type"] = next_idx
+            next_idx += 1
         if talker_col:
             columns.append(talker_col)
+            col_index["talker"] = next_idx
+            next_idx += 1
 
         query = f"SELECT {', '.join(columns)} FROM {table_name}"
         params = []
@@ -156,10 +164,10 @@ class WeChatSQLiteAdapter(BaseAdapter):
             for row_num, row in enumerate(cursor, 1):
                 try:
                     # Extract values
-                    timestamp_val = row[0]
-                    text_val = row[1]
-                    sender_val = row[2] if sender_col else None
-                    talker_val = row[4] if talker_col else None
+                    timestamp_val = row[col_index["timestamp"]]
+                    text_val = row[col_index["text"]]
+                    sender_val = row[col_index["sender"]] if sender_col else None
+                    talker_val = row[col_index["talker"]] if talker_col else None
 
                     # Parse timestamp
                     timestamp = self._parse_timestamp(timestamp_val)

@@ -1,6 +1,5 @@
 """Evidence indexer for WRI."""
 
-from datetime import datetime
 from typing import Optional
 
 from ..privacy.hashing import generate_evidence_id
@@ -117,7 +116,7 @@ def create_evidence(
         supports=supports or [],
         confidence=confidence,
         alternative_explanations=alternative_explanations or [],
-        created_at=datetime.now(),
+        created_at=message.timestamp,
     )
 
 

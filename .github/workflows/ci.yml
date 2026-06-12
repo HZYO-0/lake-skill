@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
     - uses: actions/checkout@v4
@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
@@ -34,7 +35,7 @@ jobs:
       continue-on-error: true
 
     - name: Run tests
-      run: pytest -q
+      run: pytest -q --tb=short
 
     - name: Check for privacy leaks
-      run: python tools/check_no_real_private_data.py cli skills
+      run: python tools/check_no_real_private_data.py cli skills scripts

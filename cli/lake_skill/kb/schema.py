@@ -5,6 +5,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from .. import __version__
+
 
 class KBObservation(BaseModel):
     """Knowledge base observation."""
@@ -32,7 +34,7 @@ class KBProfile(BaseModel):
 class KBMetadata(BaseModel):
     """Knowledge base metadata."""
 
-    version: str = "0.10.0"
+    version: str = __version__
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     message_count: int = 0

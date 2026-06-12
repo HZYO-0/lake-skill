@@ -12,9 +12,14 @@ import sys
 from datetime import datetime
 
 # === Configuration ===
-INPUT_FILE = r"F:\Tufeng-wechat\wechat_chat_export_wxid_crosh0315ypt22_20260605_170801_8b37f7c09c99\conversations\0001_涂凤(0723)_wxid_axszp87wk64r22_80cd1321\messages.json"
-OUTPUT_DIR = r"F:\WeChat Relationship Insight\output"
+INPUT_FILE = os.environ.get("LAKE_SKILL_INPUT_FILE", "")
+OUTPUT_DIR = os.environ.get("LAKE_SKILL_OUTPUT_DIR", "output")
 SAMPLE_SIZE = 100  # messages per sample batch (unused in full mode)
+
+if not INPUT_FILE:
+    print("Error: Set LAKE_SKILL_INPUT_FILE environment variable to your WeChat export JSON path.")
+    print("  Example: $env:LAKE_SKILL_INPUT_FILE='F:\\path\\to\\messages.json'")
+    sys.exit(1)
 
 # === Batches to extract ===
 BATCHES = [

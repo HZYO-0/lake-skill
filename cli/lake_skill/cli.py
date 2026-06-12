@@ -7,6 +7,7 @@ import typer
 from rich import print as rprint
 
 from .config import LakeSkillConfig, save_config
+from . import __version__
 
 app = typer.Typer(
     name="lake-skill",
@@ -14,7 +15,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-VERSION = "0.10.0"
+VERSION = __version__
 
 
 @app.command()
