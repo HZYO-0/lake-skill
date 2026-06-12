@@ -69,7 +69,7 @@ def format_message(msg):
     quote_content = ""
     if render_type == "quote" and msg.get("quoteContent"):
         quote_text = msg["quoteContent"][:80]
-        quote_user = "Zy" if "wxid_crosh0315ypt22" in msg.get("quoteUsername", "") else "Tf"
+        quote_user = "self" if msg.get("quoteUsername", "") == msg.get("senderUsername", "") else "target"
         quote_content = f" (quoting {quote_user}: {quote_text})"
 
     return f"[{time_text}] {sender}: {content}{quote_content}"
