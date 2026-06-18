@@ -319,7 +319,7 @@ Evidence-based intimate relationship chat analysis.
 禁止：
 > 对方就是……型。
 > 对方一定……。
-> 这能让对方离不开你。
+> 这能制造依赖或控制对方。
 
 ## 框架文件引用
 

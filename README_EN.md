@@ -3,7 +3,7 @@
 > A calm relationship mirror for chat evidence.  
 > Not a partner simulator, not a certainty machine.
 
-[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md) | [Promotion Plan](docs/promotion_plan.md) | [Migration](docs/migration_from_bondlens.md)
+[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md)
 
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
@@ -92,7 +92,7 @@ lake-skill audit analyses_or_report_dir
 lake-skill report-lint analyses_or_report_dir
 ```
 
-- `demo` creates synthetic public-safe assets for README and social posts.
+- `demo` creates synthetic public-safe assets for screenshots, scripts, and README examples.
 - `intake` reduces context-gathering turns.
 - `doctor` labels readiness as local observation, action card, or full report.
 - `bundle` collects upload-ready redacted files and writes `upload_readme.md`.
@@ -101,6 +101,14 @@ lake-skill report-lint analyses_or_report_dir
 
 ```bash
 npx skills add HZYO-0/lake-skill -y
+```
+
+Or ask an AI agent with web and terminal access:
+
+```text
+Please find LakeSkill on GitHub and install it into my local agent runtime.
+Repository: https://github.com/HZYO-0/lake-skill.git
+After installation, confirm that skills/lake-skill/SKILL.md is available.
 ```
 
 The installable Skill lives at:

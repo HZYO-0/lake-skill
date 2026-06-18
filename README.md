@@ -3,7 +3,7 @@
 > 把聊天记录放到一面安静的湖上。  
 > 看见关系的倒影，也看见自己的心。
 
-[English](README_EN.md) | [安装指南](INSTALL.md) | [快速开始](docs/quickstart.md) | [聊天记录准备](docs/chat_record_preparation.md) | [推广计划](docs/promotion_plan.md) | [迁移说明](docs/migration_from_bondlens.md)
+[English](README_EN.md) | [安装指南](INSTALL.md) | [快速开始](docs/quickstart.md) | [聊天记录准备](docs/chat_record_preparation.md)
 
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
@@ -62,33 +62,17 @@ LakeSkill 的第一屏不是长篇人格分析，而是湖镜行动卡：
 “这两天我有点敏感，刚刚那句不是想给你压力。资料我发你，忙完再说就好。”
 ```
 
-想录屏或写推广图文时，可以生成公开安全的合成示例：
+想做公开截图、长图或录屏脚本时，可以生成公开安全的合成示例：
 
 ```bash
 lake-skill demo --out examples/social_demo
 ```
 
-该命令还会生成 `examples/social_demo/social_assets/`，里面有小红书长图文案、正文草稿、抖音录屏脚本和录屏检查清单。
+该命令还会生成 `examples/social_demo/social_assets/`，里面有长图文案、正文草稿、短视频录屏脚本和录屏检查清单。
 
-## 我适合用吗
+## 先安装
 
-| 你是谁 | 最短路径 | 适合输出 |
-|---|---|---|
-| 非技术用户 | 安装 Skill 后直接粘贴一小段聊天 | 局部观察、下一句话怎么说、低风险行动卡 |
-| agent 用户 | `npx skills add HZYO-0/lake-skill -y` | 行动卡、证据报告、消息草稿、沟通建议 |
-| 隐私敏感用户 | 先用 CLI 本地脱敏、切分、体检，再上传产物 | 上传前数据体检、证据索引、完整报告 |
-
-## 三种使用路径
-
-### 1. 快速粘贴
-
-```text
-使用 lake-skill，帮我分析一下我们的聊天记录。先给行动卡。
-```
-
-适合一次具体互动、回复草稿、局部复盘。短样本不会支撑长期人格或关系模式判断。
-
-### 2. 安装 Skill
+### 方式 A：命令安装 Skill
 
 ```bash
 npx skills add HZYO-0/lake-skill -y
@@ -108,9 +92,19 @@ skills/lake-skill/
 
 Codex、Claude Code、OpenCode、手动安装和 ChatGPT Custom GPT 配置见 [INSTALL.md](INSTALL.md) 和 [docs/platform_compatibility.md](docs/platform_compatibility.md)。
 
-### 3. 本地预处理
+### 方式 B：让 AI 助手帮你安装
 
-数据量大或隐私敏感时，先安装 CLI：
+如果你的 AI 助手能联网并操作本地终端，可以直接把这段发给它：
+
+```text
+请帮我在 GitHub 上找到 LakeSkill 湖镜，并安装到本地 agent runtime。
+仓库地址：https://github.com/HZYO-0/lake-skill.git
+安装后请确认 skills/lake-skill/SKILL.md 可用。
+```
+
+### 可选：安装本地预处理 CLI
+
+数据量大或隐私敏感时，再安装 CLI：
 
 ```bash
 git clone https://github.com/HZYO-0/lake-skill.git
@@ -118,6 +112,37 @@ cd lake-skill
 pip install -e ".[dev]"
 lake-skill version
 ```
+
+如果你已经安装了依赖但命令找不到，先确认当前 Python 环境：
+
+```bash
+python -m lake_skill.cli version
+```
+
+Windows/PowerShell 如遇中文输出编码问题：
+
+```powershell
+$env:PYTHONUTF8="1"
+$env:PYTHONIOENCODING="utf-8"
+```
+
+## 安装后怎么用
+
+| 你是谁 | 最短用法 | 适合输出 |
+|---|---|---|
+| 非技术用户 | 安装 Skill 后，直接把一小段聊天粘给 agent | 局部观察、下一句话怎么说、低风险行动卡 |
+| agent 用户 | 对 agent 说“使用 lake-skill，先给行动卡” | 行动卡、证据报告、消息草稿、沟通建议 |
+| 隐私敏感用户 | 先用 CLI 本地脱敏、切分、体检，再上传产物 | 上传前数据体检、证据索引、完整报告 |
+
+### 快速粘贴
+
+```text
+使用 lake-skill，帮我分析一下我们的聊天记录。先给行动卡。
+```
+
+适合一次具体互动、回复草稿、局部复盘。短样本不会支撑长期人格或关系模式判断。
+
+### 隐私优先本地预处理
 
 典型管线：
 
@@ -133,19 +158,6 @@ lake-skill bundle --source work --out upload_bundle
 ```
 
 `intake` 会生成 `lakeskill_intake.yaml` 和 `lakeskill_intake.md`，减少 agent 来回追问。`doctor` 会把数据可用性翻译成三档：只能局部观察 / 可出行动卡 / 可出完整报告。`bundle` 会把可上传产物整理到一个文件夹。
-
-如果你已经安装了依赖但命令找不到，先确认当前 Python 环境：
-
-```bash
-python -m lake_skill.cli version
-```
-
-Windows/PowerShell 如遇中文输出编码问题：
-
-```powershell
-$env:PYTHONUTF8="1"
-$env:PYTHONIOENCODING="utf-8"
-```
 
 ## 为什么可信
 
@@ -222,24 +234,6 @@ LakeSkill 不做：
 - 前任、对象或同事的复活式模拟
 - 数据库解密或绕过访问控制
 
-## 商业使用边界
-
-当前适合探索的商业化方向：
-
-- 隐私优先的数据整理和脱敏流程
-- 本地部署、安装配置、数据体检
-- 报告模板、行动卡模板、团队内部工作流
-- 合成示例素材和公开安全的演示包
-
-暂不做：
-
-- 面向公众的持续性情感陪伴 SaaS
-- 关系结果承诺
-- 操控策略或压力测试
-- 医疗、心理健康或未成年人亲密关系服务
-
-如果未来面向中国境内公众提供持续性情感互动服务，需要按当时有效法规重新做合规评估。
-
 ## 为什么叫湖镜
 
 湖有三层意思：
@@ -267,7 +261,7 @@ skills/lake-skill/        可安装的 Skill 包
   references/frameworks/  证据、依恋、沟通、安全框架
   assets/kb_template/     增量知识库模板
 cli/lake_skill/           可选本地预处理 CLI
-docs/                     用户、平台兼容和宣传文档
+docs/                     用户、安装和平台兼容文档
 examples/                 合成示例输入和期望输出结构
 tests/                    CLI、解析器、安全和审计测试
 ```

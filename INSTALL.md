@@ -25,6 +25,16 @@ To inspect detected skills before installing:
 npx skills add HZYO-0/lake-skill --list
 ```
 
+### Ask An AI Agent To Install It
+
+If your AI agent can use the web and your local terminal, paste this request:
+
+```text
+请帮我在 GitHub 上找到 LakeSkill 湖镜，并安装到本地 agent runtime。
+仓库地址：https://github.com/HZYO-0/lake-skill.git
+安装后请确认 skills/lake-skill/SKILL.md 可用。
+```
+
 ### Codex Built-In Installer
 
 ```bash
