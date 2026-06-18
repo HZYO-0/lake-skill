@@ -49,8 +49,8 @@ SCENARIOS = {
     },
     "cli_export": {
         "must_contain": [
-            r"E\d{3}",  # evidence ID reference
-            r"S\d{3}",  # session ID reference
+            r"E(?:-\d{8}-\d{3}|\d{3})",  # evidence ID reference
+            r"S(?:-\d{8}-\d{3}|\d{3})",  # session ID reference
             r"置信度|confidence",  # confidence level
         ],
         "must_not_contain": [

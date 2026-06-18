@@ -1,6 +1,9 @@
-"""WeChat Relationship Insight CLI."""
+"""LakeSkill CLI."""
 
+import importlib.util
+import sys
 from pathlib import Path
+from types import ModuleType
 from typing import Optional
 
 import typer
@@ -16,6 +19,22 @@ app = typer.Typer(
 )
 
 VERSION = __version__
+
+
+def _project_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _load_script_module(script_name: str) -> ModuleType:
+    """Load a repo script by filename without requiring scripts to be a package."""
+    script_path = _project_root() / "scripts" / script_name
+    spec = importlib.util.spec_from_file_location(f"lake_skill_{script_name}", script_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load script: {script_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 @app.command()
@@ -91,6 +110,21 @@ build/
 def version() -> None:
     """Show version."""
     rprint(f"[blue]lake-skill v{VERSION}[/blue]")
+
+
+@app.command()
+def demo(
+    out: str = typer.Option("examples/social_demo", "--out", "-o", help="Output demo directory"),
+) -> None:
+    """Generate a synthetic public demo package for README and social video recording."""
+    from .demo_assets import generate_demo_package
+
+    output_path = Path(out)
+    generate_demo_package(output_path)
+    rprint(f"[green]Generated synthetic demo package -> {output_path}[/green]")
+    rprint(f"  {output_path / 'synthetic_chat.csv'}")
+    rprint(f"  {output_path / 'social_action_card_demo.md'}")
+    rprint("[yellow]Demo files are synthetic and publish-safe; do not replace them with private analyses.[/yellow]")
 
 
 @app.command()
@@ -617,6 +651,87 @@ def export(
                 f.write(json.dumps(entry, ensure_ascii=False) + "\n")
         rprint(f"[green]Exported {len(sessions)} conversations (full) -> {output_path}[/green]")
         rprint("[red]Warning: This file contains raw text. Do NOT upload to cloud services.[/red]")
+
+
+@app.command()
+def bundle(
+    source: str = typer.Option("work", "--source", "-s", help="Directory containing preprocessed artifacts"),
+    out: str = typer.Option("upload_bundle", "--out", "-o", help="Output upload bundle directory"),
+) -> None:
+    """Collect upload-ready redacted artifacts and write upload_readme.md."""
+    from .bundle import bundle_upload_artifacts
+
+    source_path = Path(source)
+    output_path = Path(out)
+    try:
+        copied = bundle_upload_artifacts(source_path, output_path)
+    except FileNotFoundError as exc:
+        rprint(f"[red]Error: {exc}[/red]")
+        raise typer.Exit(1)
+
+    rprint(f"[green]Created upload bundle -> {output_path}[/green]")
+    for filename in copied:
+        rprint(f"  {filename}")
+    rprint("[yellow]Review upload_readme.md and run check-leaks before uploading.[/yellow]")
+
+
+@app.command()
+def audit(
+    analyses_dir: str = typer.Argument(".", help="Analysis directory"),
+    ledger: Optional[str] = typer.Option(None, "--ledger", help="relationship_signal_ledger.jsonl path"),
+    report: Optional[str] = typer.Option(None, "--report", help="LakeSkill report path"),
+    corrections: Optional[list[str]] = typer.Option(None, "--corrections", help="Correction JSONL path"),
+) -> None:
+    """Run relationship-signal reliability audit."""
+    module = _load_script_module("relationship_signal_audit.py")
+    args = [analyses_dir]
+    if ledger:
+        args.extend(["--ledger", ledger])
+    if report:
+        args.extend(["--report", report])
+    if corrections:
+        args.append("--corrections")
+        args.extend(corrections)
+
+    exit_code = module.main(args)
+    if exit_code:
+        raise typer.Exit(exit_code)
+
+
+@app.command("report-lint")
+def report_lint(
+    analyses_dir: str = typer.Argument(".", help="Directory containing LakeSkill reports"),
+) -> None:
+    """Lint LakeSkill reports for risk words, missing layers, and weak conclusion format."""
+    module = _load_script_module("report_lint.py")
+    root = Path(analyses_dir)
+    if not root.exists():
+        rprint(f"[red]Error: Directory not found: {root}[/red]")
+        raise typer.Exit(1)
+
+    report_files = sorted({*root.glob("lakeskill_report*.md"), *root.glob("*_v4.md")})
+    print("=" * 60)
+    print("LakeSkill Report Lint")
+    print("=" * 60)
+    if not report_files:
+        print("[WARN] 未找到 lakeskill_report*.md 或 *_v4.md 报告文件")
+        raise typer.Exit(1)
+
+    total_issues = 0
+    for report_path in report_files:
+        result = module.lint_report(report_path)
+        total_issues += module.print_report(result)
+
+    print(f"\n{'=' * 60}")
+    print("汇总")
+    print(f"{'=' * 60}")
+    print(f"  扫描报告: {len(report_files)} 个")
+    print(f"  总问题数: {total_issues}")
+    if total_issues == 0:
+        print("\n  [PASS] 所有报告通过 lint 检查")
+    else:
+        print(f"\n  [WARN] 发现 {total_issues} 个问题，建议修复")
+        raise typer.Exit(1)
 
 
 @app.command()

@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PYTEST_BASETEMP = PROJECT_ROOT / "work" / "test-artifacts" / "pytest-tmp"
 
 
 def run(cmd: list[str], label: str, advisory: bool = False) -> tuple[bool, str]:
@@ -21,7 +22,13 @@ def run(cmd: list[str], label: str, advisory: bool = False) -> tuple[bool, str]:
     print(f"{'='*60}")
     try:
         r = subprocess.run(
-            cmd, cwd=str(PROJECT_ROOT), capture_output=True, text=True, timeout=120
+            cmd,
+            cwd=str(PROJECT_ROOT),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
         )
         output = r.stdout + r.stderr
         ok = r.returncode == 0
@@ -71,7 +78,19 @@ def main() -> int:
     results.append(("ruff", ok))
 
     # 3. Pytest
-    ok, out = run([sys.executable, "-m", "pytest", "-q"], "Pytest")
+    ok, out = run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp",
+            str(PYTEST_BASETEMP),
+        ],
+        "Pytest",
+    )
     if ok:
         # Extract test count
         for line in out.strip().splitlines():

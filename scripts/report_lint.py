@@ -227,9 +227,9 @@ def main():
     print("LakeSkill Report Lint")
     print("=" * 60)
 
-    report_files = sorted(analyses_dir.glob("*_v4.md"))
+    report_files = sorted({*analyses_dir.glob("lakeskill_report*.md"), *analyses_dir.glob("*_v4.md")})
     if not report_files:
-        print("[WARN] 未找到 *_v4.md 报告文件")
+        print("[WARN] 未找到 lakeskill_report*.md 或 *_v4.md 报告文件")
         return
 
     total_issues = 0

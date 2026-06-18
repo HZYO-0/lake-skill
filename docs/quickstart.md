@@ -135,4 +135,4 @@ A complete 0.10.0 report should include:
 - Evidence IDs for major claims
 - Confidence, counterevidence, and alternative explanations
 - Concrete next steps and ready-to-send messages
-- Safety boundaries: no diagnosis, no manipulation, no deterministic claims
+- Safety boundaries: no medical or mental-health judgement, no manipulation, no deterministic claims

@@ -1,4 +1,4 @@
-"""Error handling for WRI."""
+"""Error handling for LakeSkill."""
 
 
 class LakeSkillError(Exception):

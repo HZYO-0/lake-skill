@@ -51,14 +51,20 @@ dist/
 build/
 *.egg-info/
 
-# model outputs (contain actual analysis results)
+# model outputs (actual analysis results stay ignored; synthetic fixtures are allowed)
 examples/model_outputs/*.md
+!examples/model_outputs/README.md
+!examples/model_outputs/sparse_output.md
+!examples/model_outputs/representative_output.md
+!examples/model_outputs/cli_export_output.md
 
 # allow installable skills and synthetic fixtures
 !skills/**
 !tests/fixtures/**
 !examples/synthetic_input/**
 !examples/synthetic_outputs/**
+!examples/social_demo/
+!examples/social_demo/**
 !docs/**
 !README.md
 

@@ -2088,7 +2088,7 @@ services:
       - ./kb:/app/kb
       - ./reports:/app/reports
     environment:
-      - WRI_PRIVACY_MODE=cloud-safe
+      - LAKE_SKILL_PRIVACY_MODE=cloud-safe
 ```
 
 使用：

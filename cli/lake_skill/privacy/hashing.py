@@ -1,4 +1,4 @@
-"""Deterministic hashing for WRI."""
+"""Deterministic hashing for LakeSkill."""
 
 import hashlib
 from datetime import datetime

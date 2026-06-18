@@ -1,4 +1,4 @@
-"""Session segmentation for WRI."""
+"""Session segmentation for LakeSkill."""
 
 from datetime import datetime, timedelta
 from typing import Optional

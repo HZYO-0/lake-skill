@@ -1,4 +1,4 @@
-"""Evidence indexer for WRI."""
+"""Evidence indexer for LakeSkill."""
 
 from typing import Optional
 

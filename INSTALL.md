@@ -103,6 +103,18 @@ pip install -e ".[dev]"
 lake-skill version
 ```
 
+If you use Conda on Windows, activate the environment before every verification:
+
+```powershell
+conda activate skills
+$env:PYTHONUTF8="1"
+$env:PYTHONIOENCODING="utf-8"
+pip install -e ".[dev]"
+python -m lake_skill.cli version
+```
+
+`pip install` without arguments only prints a pip error. Use `pip install -e ".[dev]"` from the repository root so Typer, Rich, Pydantic, pytest, Ruff, and safety tools are installed in the active environment.
+
 Initialize a local project:
 
 ```bash
@@ -118,7 +130,10 @@ lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.js
 lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
 lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
 lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+lake-skill intake --out work --type ambiguous --status unknown --work-mode practical
+lake-skill doctor --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work
 lake-skill export --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/conversations.jsonl --mode conversations
+lake-skill bundle --source work --out upload_bundle
 ```
 
 Upload these processed files to the Skill:
@@ -126,6 +141,7 @@ Upload these processed files to the Skill:
 - `work/digest.redacted.md`
 - `work/sessions.redacted.jsonl`
 - `work/evidence.redacted.jsonl`
+- `work/lakeskill_intake.yaml` if generated
 - `work/conversations.jsonl` if you want richer analysis
 
 ---
@@ -151,3 +167,5 @@ ChatGPT setup is less deterministic than a native Skill runtime because it does 
 | Agent makes strong claims | Ask it to rerun with LakeSkill safety boundaries and cite evidence IDs |
 | Privacy concern | Use CLI redaction and upload only redacted digest/evidence/session files |
 | SQLite import fails | Confirm the database is plaintext SQLite; LakeSkill does not decrypt protected databases |
+| `ModuleNotFoundError: typer` | Activate the intended environment and run `pip install -e ".[dev]"` from the repository root |
+| Chinese output crashes on Windows | Set `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8` before running checks |

@@ -1,4 +1,4 @@
-"""Data schemas for WRI."""
+"""Data schemas for LakeSkill."""
 
 from datetime import datetime
 from enum import Enum

@@ -1,6 +1,9 @@
 # Model Outputs
 
-This directory stores actual Skill outputs for structural validation.
+This directory stores Skill outputs for structural validation.
+
+Real private analysis outputs stay ignored by `.gitignore`. The committed
+`*_output.md` files are synthetic fixtures only.
 
 ## How to use
 
@@ -33,4 +36,4 @@ python tools/check_expected_output.py --scenario cli_export examples/model_outpu
 | representative | Evidence IDs, confidence, alternatives | Certainty language, clinical diagnoses |
 | cli_export | Evidence/session ID references | Requests for more raw data |
 
-These files are not committed to the repo (they contain actual analysis output).
+Do not add real chat analysis outputs here. Keep public fixtures synthetic.

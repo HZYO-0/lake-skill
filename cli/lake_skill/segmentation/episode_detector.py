@@ -1,4 +1,4 @@
-"""Episode detection for WRI."""
+"""Episode detection for LakeSkill."""
 
 import re
 from typing import Optional

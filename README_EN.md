@@ -3,7 +3,7 @@
 > A calm relationship mirror for chat evidence.  
 > Not a partner simulator, not a certainty machine.
 
-[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md) | [Migration](docs/migration_from_bondlens.md)
+[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md) | [Promotion Plan](docs/promotion_plan.md) | [Migration](docs/migration_from_bondlens.md)
 
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
@@ -68,7 +68,7 @@ Confidence: low to medium. The sample is too short for a stable relationship-lev
 - **Evidence report**: relationship timeline, signal ledger, communication portraits, interaction loops, repair signals, confidence, counterevidence, and alternative explanations.
 - **Coaching mode**: follow-up help for "what should I say?", "did I overstep?", or "should I hold steady or escalate?"
 
-LakeSkill does not provide clinical diagnosis, manipulation tactics, deterministic claims about another person's intent, relationship outcome prediction, revival-style simulation, database decryption, or access-control bypass.
+LakeSkill does not provide medical or mental-health judgement, manipulation tactics, deterministic claims about another person's intent, relationship outcome prediction, revival-style simulation, database decryption, or access-control bypass.
 
 ## Why Trust It
 
@@ -79,7 +79,23 @@ LakeSkill does not provide clinical diagnosis, manipulation tactics, determinist
 | Timeline first | Prevent early refusals from erasing later changes, or later ambiguity from erasing earlier boundaries |
 | Multi-factor interpretation | Avoid collapsing conclusions into "likes me / does not like me" or "avoidant / not avoidant" |
 | Reliability audit | Check T1 coverage, T4 overreach, single-factor claims, counterevidence, and alternatives |
-| Privacy-first CLI | Redact, segment, summarize, and index sensitive data locally before upload |
+| Privacy-first CLI | Redact, segment, summarize, index, check readiness, and bundle sensitive data locally before upload |
+
+## CLI Helpers
+
+```bash
+lake-skill demo --out examples/social_demo
+lake-skill intake --out work --work-mode practical
+lake-skill doctor --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work
+lake-skill bundle --source work --out upload_bundle
+lake-skill audit analyses_or_report_dir
+lake-skill report-lint analyses_or_report_dir
+```
+
+- `demo` creates synthetic public-safe assets for README and social posts.
+- `intake` reduces context-gathering turns.
+- `doctor` labels readiness as local observation, action card, or full report.
+- `bundle` collects upload-ready redacted files and writes `upload_readme.md`.
 
 ## Install
 
@@ -110,6 +126,8 @@ lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.js
 lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
 lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
 lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
+lake-skill doctor --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work
+lake-skill bundle --source work --out upload_bundle
 ```
 
 See [INSTALL.md](INSTALL.md), [docs/quickstart.md](docs/quickstart.md), and [docs/platform_compatibility.md](docs/platform_compatibility.md) for platform-specific setup.

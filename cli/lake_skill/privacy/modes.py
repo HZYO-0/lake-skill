@@ -1,4 +1,4 @@
-"""Privacy modes for WRI."""
+"""Privacy modes for LakeSkill."""
 
 from enum import Enum
 

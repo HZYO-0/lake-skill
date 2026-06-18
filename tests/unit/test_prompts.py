@@ -24,6 +24,7 @@ REQUIRED_PROMPTS = [
     "relationship_signal_extractor.md",
     "multi_factor_interpreter.md",
     "relationship_timeline_builder.md",
+    "safety_notice.md",
 ]
 
 REQUIRED_FRAMEWORKS = [
@@ -157,3 +158,37 @@ def test_action_brief_has_degraded_mode():
     assert "降级行动卡" in content
     assert "缺少 T1" in content
     assert "审计状态" in content
+
+
+def test_safety_notice_defines_required_public_boundaries():
+    """Safety notice prompt defines identity, consent, crisis, and minor-use boundaries."""
+    content = (PROMPTS_DIR / "safety_notice.md").read_text(encoding="utf-8")
+
+    assert "AI 身份与范围" in content
+    assert "证据整理" in content
+    assert "不扮演对方" in content
+    assert "数据与同意" in content
+    assert "有权处理" in content
+    assert "合成数据" in content
+    assert "风险与危机" in content
+    assert "自伤" in content
+    assert "伤害他人" in content
+    assert "被威胁" in content
+    assert "被跟踪" in content
+    assert "现实支持系统" in content
+    assert "当地紧急服务" in content
+    assert "未成年人限制" in content
+    assert "不面向未成年人" in content
+
+
+def test_skill_and_report_builder_require_safety_notice():
+    """Skill workflow and report builder require the safety notice before Layer -1."""
+    skill_content = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    report_builder = (PROMPTS_DIR / "report_builder.md").read_text(encoding="utf-8")
+
+    assert "prompts/safety_notice.md" in skill_content
+    assert "使用边界与风险提示" in report_builder
+    assert "覆盖声明后" in report_builder
+    assert "Layer -1 前" in report_builder
+    assert "不能被省略" in report_builder
+    assert "低置信" in report_builder

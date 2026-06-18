@@ -38,7 +38,7 @@ timestamp,sender,receiver,content
 - No encryption or key extraction
 - User must have legitimate access
 
-**Schema detection**: WRI automatically detects message tables based on column names.
+**Schema detection**: LakeSkill automatically detects message tables based on column names.
 
 ### Voice Transcripts
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-WRI supports two usage modes with different privacy characteristics:
+LakeSkill supports two usage modes with different privacy characteristics:
 
 **Direct Mode** — Paste or upload chat records directly to the Skill. Data passes through the platform (ChatGPT, Claude, etc.). Quick to start, lower privacy.
 

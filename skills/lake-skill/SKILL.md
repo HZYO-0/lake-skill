@@ -39,6 +39,8 @@ Evidence-based intimate relationship chat analysis.
 
 ## 工作流
 
+在任何报告、行动卡、教练回复或消息草稿前，先遵守 `prompts/safety_notice.md`。如果材料涉及自伤、伤害他人、被威胁、被跟踪、现实暴力风险或未成年人亲密陪伴场景，优先输出安全边界、现实支持和专业求助提示，而不是继续做关系推进建议。
+
 ### Step 0: 确认关系类型、分析目标与工作模式
 
 参考 `prompts/intake.md`，在 3 轮对话内收集：

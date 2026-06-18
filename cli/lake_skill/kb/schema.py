@@ -1,4 +1,4 @@
-"""Knowledge base schema for WRI."""
+"""Knowledge base schema for LakeSkill."""
 
 from datetime import datetime
 from typing import Optional

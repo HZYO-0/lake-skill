@@ -1,0 +1,13 @@
+created_at: '2026-06-17T22:38:52.163864'
+data_source: synthetic csv
+duration: synthetic sample
+goal: 生成行动卡演示
+output_preference: action_card_first
+privacy_mode: publish-safe
+relationship_type: ambiguous
+scene_summary: 合成短样本：压力表达、求助、降压回应、慢慢来。
+self_name: 我
+status: short synthetic demo
+target_name: TA
+version: 0.10.0
+work_mode: practical

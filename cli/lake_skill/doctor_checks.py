@@ -53,7 +53,29 @@ def run_doctor_checks(
     else:
         overall = "insufficient"
 
-    return {"checks": checks, "overall": overall}
+    return {
+        "checks": checks,
+        "overall": overall,
+        "actionability": actionability_tier(overall),
+    }
+
+
+def actionability_tier(overall: str) -> dict:
+    """Translate internal readiness into user-facing analysis depth."""
+    if overall == "ready":
+        return {
+            "label": "可出完整报告",
+            "detail": "数据覆盖、双方参与和关系信号都较充分，可生成行动卡、证据报告和沟通建议。",
+        }
+    if overall == "marginal":
+        return {
+            "label": "可出行动卡",
+            "detail": "数据可支持当前局势和低风险行动建议，但人格、依恋或长期关系判断需降级标注。",
+        }
+    return {
+        "label": "只能局部观察",
+        "detail": "数据不足以支撑关系性质或长期模式判断，只能用于局部场景复盘和低风险话术。",
+    }
 
 
 def check_message_count(messages: list[Message]) -> dict:
@@ -190,6 +212,7 @@ def format_readiness_report(results: dict) -> str:
     """Format doctor check results as markdown."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     overall = results["overall"]
+    actionability = results.get("actionability", actionability_tier(overall))
 
     verdict = {"ready": "✅ 数据充分，可进行完整分析", "marginal": "⚠️ 数据基本可用，部分维度可能置信度较低", "insufficient": "❌ 数据不足，建议补充更多聊天记录"}
 
@@ -198,6 +221,11 @@ def format_readiness_report(results: dict) -> str:
         "",
         f"**Generated**: {now}",
         f"**Overall**: {verdict.get(overall, overall)}",
+        f"**可分析程度**: {actionability['label']}",
+        "",
+        "## Actionability Tier",
+        "",
+        f"**{actionability['label']}**：{actionability['detail']}",
         "",
         "## Checks",
         "",

@@ -1,4 +1,4 @@
-"""Digest generation for WRI."""
+"""Digest generation for LakeSkill."""
 
 from datetime import datetime
 from typing import Optional
