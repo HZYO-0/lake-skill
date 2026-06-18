@@ -64,11 +64,23 @@ Confidence: low to medium. The sample is too short for a stable relationship-lev
 
 ## What You Get
 
-- **Lake Mirror action card**: current situation, strategy, this week's actions, what to avoid, signals to watch, and message drafts.
-- **Evidence report**: relationship timeline, signal ledger, communication portraits, interaction loops, repair signals, confidence, counterevidence, and alternative explanations.
-- **Coaching mode**: follow-up help for "what should I say?", "did I overstep?", or "should I hold steady or escalate?"
+Open the report and the first thing you see is not a personality analysis. It is an action card:
+
+- **What to do right now**: hold steady, repair, gently push, or step back — backed by evidence, not guesswork.
+- **Which claims are可信**: every conclusion carries an evidence ID, confidence level, and counterevidence so you know what is grounded and what is emotional amplification.
+- **3 concrete actions this week**: specific moves, things to avoid, and ready-to-send messages — no need to guess phrasing.
 
 LakeSkill does not provide medical or mental-health judgement, manipulation tactics, deterministic claims about another person's intent, relationship outcome prediction, revival-style simulation, database decryption, or access-control bypass.
+
+## Who Is This For
+
+| You are | Shortest path | You get |
+|---|---|---|
+| Non-technical user | Install Skill, paste a short chat | Local observations, reply drafts, low-risk action card |
+| Agent user | Say "use lake-skill, give me the action card first" | Action card, evidence report, message drafts, coaching |
+| Privacy-sensitive user | CLI redact, segment, doctor, then upload | Pre-upload readiness check, evidence index, full report |
+
+Not sure which path? Install the Skill, paste one chat, try it once. 5 minutes to know if it fits.
 
 ## Why Trust It
 
@@ -92,10 +104,18 @@ lake-skill audit analyses_or_report_dir
 lake-skill report-lint analyses_or_report_dir
 ```
 
-- `demo` creates synthetic public-safe assets for screenshots, scripts, and README examples.
+- `demo` creates synthetic public-safe assets for screenshots, scripts, short-video recordings, and README examples.
 - `intake` reduces context-gathering turns.
 - `doctor` labels readiness as local observation, action card, or full report.
 - `bundle` collects upload-ready redacted files and writes `upload_readme.md`.
+
+Want to post on social media or make a tutorial? Generate public-safe synthetic assets in one command:
+
+```bash
+lake-skill demo --out examples/social_demo
+```
+
+This also creates `examples/social_demo/social_assets/` with Xiaohongshu carousel copy, caption drafts, Douyin recording scripts, and a recording checklist.
 
 ## Install
 

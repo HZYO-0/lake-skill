@@ -182,45 +182,51 @@ def generate_social_assets(output_dir: Path) -> None:
 
 ## Page 1
 
-标题：AI 说得太肯定时，先别急着信。
+标题：TA 回得慢 = 不在乎？先别急着下结论。
 
-副标题：LakeSkill 湖镜只把聊天证据整理成行动卡，不扮演对方。
+副标题：一个开源工具，把聊天证据整理成行动卡，不替你猜 TA 的心。
 
 ## Page 2
 
-问题：TA 回得慢，能不能说明关系变冷？
+你有没有过这种时刻？
 
-合成示例回答：不能单靠一次短回复下结论。先看时间线、后续主动性、关系定义和边界信号。
+TA 回复变慢了，你开始反复翻聊天记录，想找到一个确定答案。
+
+但 AI 说得越肯定，你越焦虑。
 
 ## Page 3
 
-LakeSkill 的第一屏不是长报告。
+LakeSkill 不一样。
 
-它先给湖镜行动卡：当前策略、本周动作、不要做什么、可直接发送的话。
+它的第一屏不是人格分析，而是一张行动卡：
+
+现在该稳住、修复、轻推，还是先回到自己。
 
 ## Page 4
 
-每条建议都要能追到证据 ID。
+每条建议都能追到证据 ID。
 
-合成示例：E-20260108-001 支持“低压稳定”，不支持继续追问关系定义。
+合成示例：E-20260108-001 支持"低压稳定"，不支持继续追问关系定义。
+
+置信度、反证、替代解释——全标出来。
 
 ## Page 5
 
-数据体检分三档：只能局部观察 / 可出行动卡 / 可出完整报告。
+如果证据不够，它会降级，而不是把话说满。
 
-如果证据不够，LakeSkill 应该降级，而不是把话说满。
+数据体检分三档：只能局部观察 / 可出行动卡 / 可出完整报告。
 
 ## Page 6
 
-公开展示只用合成数据。
+隐私优先：本地脱敏、数据体检、打包，确认安全再上传。
 
-不要把真实微信 ID、真实聊天、真实路径或可识别个人的信息放进图文。
+公开展示只用合成数据，不用真实聊天。
 
 ## Page 7
 
-CTA：GitHub 搜 LakeSkill 湖镜，先跑一次合成 demo。
+CTA：GitHub 搜「LakeSkill 湖镜」，装好 Skill，粘一段聊天试一次。
 
-一句话：AI 不该替你脑补关系答案。LakeSkill 只做一件事：把聊天证据整理成行动卡。
+AI 不该替你脑补关系答案。它只做一件事：把证据整理成你能用的行动卡。
 """,
         encoding="utf-8",
     )
@@ -230,32 +236,25 @@ CTA：GitHub 搜 LakeSkill 湖镜，先跑一次合成 demo。
 
 > 合成示例。公开发布前请只配 `lake-skill demo` 生成的截图。
 
-很多关系焦虑不是来自证据本身，而是来自把一个局部信号放大成完整答案。
+你有没有把聊天记录丢给 AI，让它帮你判断"TA 到底怎么想"？
 
-LakeSkill 湖镜做的是更克制的事：先整理证据，再给行动卡。它不会扮演 TA，也不会声称知道 TA 的真实内心。
+AI 回得很快、很肯定，但你越看越焦虑——因为它说得太像真的了。
 
-它更像一个刹车：当 AI 很想给确定答案时，先问三件事：
+LakeSkill 湖镜做的是更克制的事：它不替你猜 TA 的心，只把聊天证据整理成一张行动卡。
 
-1. 证据 ID 在哪里？
-2. 置信度到哪里？
-3. 还有没有反证和替代解释？
+每条建议都有三个东西：
 
-公开演示流程：
+1. 证据 ID——你能在聊天记录里找到原话。
+2. 置信度——它知道自己的判断有多可靠。
+3. 反证和替代解释——它不只给你一个答案。
 
-```bash
-lake-skill demo --out examples/social_demo
-```
+如果证据不够，它会降级：只给低风险观察，不给完整判断。
 
-然后截图：
+想试试？GitHub 搜「LakeSkill 湖镜」，装好后粘一段聊天就行。
 
-- `synthetic_chat.csv`
-- `social_action_card_demo.md`
-- `work/data_readiness.md`
-- `upload_bundle/upload_readme.md`
+公开演示只用合成数据，不用真实聊天。
 
-所有素材都是合成示例，不使用真实聊天。
-
-标签建议：#AI工具 #聊天分析 #隐私保护 #开源项目 #Codex #LakeSkill
+标签建议：#AI工具 #聊天分析 #关系行动卡 #隐私保护 #开源项目 #LakeSkill
 """,
         encoding="utf-8",
     )
@@ -265,45 +264,45 @@ lake-skill demo --out examples/social_demo
 
 > 合成示例。录屏只展示 `examples/social_demo`，不要展示真实聊天或本地私有路径。
 
-## 0-3s
+## 0-3s（钩子）
 
-画面：README 一句话定位，鼠标停在“证据支持什么、不支持什么”。
+画面：屏幕中央大字「TA 回得慢 = 不在乎？」，3 秒后打出红色叉号。
 
-旁白：把聊天记录丢给 AI，最怕它说得太像真的。
+旁白：把聊天记录丢给 AI，最怕它说得太肯定。
 
-字幕：先别急着信，先看证据。
+字幕：AI 说得越肯定，你越焦虑。
 
-## 3-8s
+## 3-8s（引出工具）
 
 画面：终端运行 `lake-skill demo --out examples/social_demo`。
 
-旁白：我用合成示例生成公开安全的演示材料。
+旁白：我做了一个不一样的工具：它不猜 TA 的心，只整理证据。
 
-字幕：公开演示只用合成数据。
+字幕：不猜心，只整理证据。
 
-## 8-15s
+## 8-15s（展示输入）
 
-画面：打开 `synthetic_chat.csv`，展示“我 / TA / 时间”三列。
+画面：打开 `synthetic_chat.csv`，展示"我 / TA / 时间"三列。
 
-旁白：先看原始合成对话，再看它怎么变成证据。
+旁白：粘一段聊天，它先回到时间线，再找证据。
 
 字幕：聊天先回到时间线。
 
-## 15-25s
+## 15-25s（展示核心输出）
 
-画面：打开 `social_action_card_demo.md`，放大“当前策略”“证据 ID”“不要做”。
+画面：打开 `social_action_card_demo.md`，放大"当前策略""证据 ID""不要做"。
 
-旁白：第一屏不是长报告，是行动卡：下一步做什么、不要做什么、证据在哪里。
+旁白：第一屏不是长报告，是行动卡：该做什么、不要做什么、证据在哪。每条都能追到原话。
 
 字幕：行动卡 = 动作 + 边界 + 证据 ID。
 
-## 25-35s
+## 25-35s（CTA）
 
 画面：打开 `work/data_readiness.md` 和 `upload_bundle/upload_readme.md`。
 
-旁白：上传前先看 doctor 三档，再用 bundle 整理可上传材料。GitHub 搜 LakeSkill 湖镜，先跑一次 demo。
+旁白：上传前先做数据体检，再用 bundle 打包。GitHub 搜「LakeSkill 湖镜」，装好粘一段聊天试一次。
 
-字幕：本地脱敏，再决定上传什么。
+字幕：GitHub 搜 LakeSkill 湖镜。
 """,
         encoding="utf-8",
     )
@@ -317,10 +316,12 @@ lake-skill demo --out examples/social_demo
 - [ ] 打开 synthetic CSV：`examples/social_demo/synthetic_chat.csv`
 - [ ] 打开行动卡：`examples/social_demo/social_action_card_demo.md`
 - [ ] 展示证据 ID：例如 `E-20260108-001`
+- [ ] 展示置信度和反证：行动卡中的"置信度：低到中"
 - [ ] 运行 doctor 三档：`lake-skill doctor --messages examples/social_demo/work/messages.redacted.jsonl --sessions examples/social_demo/work/sessions.redacted.jsonl --out examples/social_demo/work`
 - [ ] 展示 bundle 结果：`examples/social_demo/upload_bundle/upload_readme.md`
 - [ ] 运行 check-leaks：`lake-skill check-leaks examples/social_demo`
 - [ ] 检查画面中没有真实微信 ID、真实聊天、真实路径或可识别个人信息
+- [ ] 旁白和字幕匹配录屏脚本时间线
 """,
         encoding="utf-8",
     )
