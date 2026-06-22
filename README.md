@@ -31,7 +31,7 @@
 [2026-06-02 09:10] TA: 昨天那个资料你还有吗？
 ```
 
-LakeSkill 的第一屏不是长篇人格分析，而是湖镜行动卡：
+打开报告，你第一眼看到的是行动卡——该做什么、不要做什么、证据在哪：
 
 ```markdown
 ## 先看这个：湖镜行动卡（关系行动卡）
@@ -100,23 +100,69 @@ npx skills add HZYO-0/lake-skill -y
 仓库地址：https://github.com/HZYO-0/lake-skill.git
 ```
 
-从微信导出聊天记录？用 [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) 解密后导入。教程见 [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md)。
+从微信导出聊天记录？用 [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis)（GitHub 1.4k stars）解密微信数据库，导出后导入 LakeSkill。
 
 更多安装方式（Codex、Claude Code、手动、ChatGPT GPT）见 [INSTALL.md](INSTALL.md)。
 
 ## 怎么用
 
-| 你是谁 | 最短路径 | 你会得到 |
-|---|---|---|
-| 非技术用户 | 安装后直接粘一小段聊天 | 局部观察、下一句话怎么说、行动卡 |
-| agent 用户 | 说"使用 lake-skill，先给行动卡" | 行动卡、证据报告、消息草稿 |
-| 隐私敏感用户 | CLI 本地脱敏后再上传 | 数据体检、证据索引、完整报告 |
+### 直接粘贴
+
+安装好 Skill 后，把聊天记录粘给 agent：
+
+```text
+使用 lake-skill，帮我分析这段聊天记录。先给行动卡。
+```
+
+### 告诉 agent 文件位置
+
+如果聊天记录已经导出为文件（CSV、TXT、SQLite），告诉 agent 文件路径：
+
+```text
+使用 lake-skill，分析这个文件里的聊天记录：D:\聊天记录\chat.csv。先给行动卡。
+```
+
+### 本地预处理后上传
+
+隐私敏感时，先用 CLI 脱敏再上传：
+
+```bash
+lake-skill redact --file chat.jsonl --out chat.redacted.jsonl --privacy-mode cloud-safe
+```
+
+然后告诉 agent 读取脱敏后的文件。
 
 不确定？先装好，粘一段聊天试一次。5 分钟就知道适不适合。
 
-```text
-使用 lake-skill，帮我分析一下我们的聊天记录。先给行动卡。
-```
+## 功能特性
+
+### 数据源
+
+| 来源 | 格式 | 备注 |
+|---|---|---|
+| 微信聊天记录 | WeChatDataAnalysis 导出（TXT/JSON/SQLite） | 推荐，信息最丰富 |
+| 通用聊天记录 | CSV / TXT / JSONL | 多数导出工具默认格式 |
+| 语音转文字 | SRT / VTT | 带时间戳的语音识别结果 |
+| OCR 提取 | JSONL / CSV | 截图识别后的文本 |
+| 直接粘贴 | 纯文本 | 最快的测试方式 |
+
+### 分析能力
+
+| 能力 | 说明 |
+|---|---|
+| 湖镜行动卡 | 第一屏回答"我现在该怎么做"，有证据支撑 |
+| 证据报告 | 9 层结构：行动卡 → 局势 → 时间线 → 双方画像 → 互动模式 → 依恋信号 → 沟通建议 → 不确定性 |
+| 教练模式 | 继续追问，给多种语气的话术 |
+| 数据体检 | doctor 三档：只能局部观察 / 可出行动卡 / 可出完整报告 |
+| 增量更新 | 新聊天记录自动 merge 进已有分析 |
+| 对话纠正 | 说"TA 不会这样说"，立即更新 |
+
+### 隐私机制
+
+- 本地脱敏：`lake-skill redact` 去除姓名、电话、地址
+- 泄露检查：`lake-skill check-leaks` 扫描残留隐私信息
+- 打包上传：`lake-skill bundle` 只打包脱敏后的产物
+- 公开展示：`lake-skill demo` 生成合成数据，不用真实聊天
 
 ## 适合什么场景
 

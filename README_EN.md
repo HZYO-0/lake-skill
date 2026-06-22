@@ -101,23 +101,69 @@ Please find LakeSkill on GitHub and install it into my local agent runtime.
 Repository: https://github.com/HZYO-0/lake-skill.git
 ```
 
-Exporting from WeChat? Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt and export, then import into LakeSkill. Guide: [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md).
+Exporting from WeChat? Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) (GitHub 1.4k stars) to decrypt WeChat databases, export, then import into LakeSkill.
 
 More install options (Codex, Claude Code, manual, ChatGPT GPT): [INSTALL.md](INSTALL.md).
 
 ## How To Use
 
-| You are | Shortest path | You get |
-|---|---|---|
-| Non-technical user | Install, paste a short chat | Local observations, reply drafts, action card |
-| Agent user | Say "use lake-skill, give me the action card first" | Action card, evidence report, message drafts |
-| Privacy-sensitive user | CLI redact locally, then upload | Data readiness check, evidence index, full report |
+### Paste directly
 
-Not sure? Install, paste one chat, try it once. 5 minutes to know.
+After installing the Skill, paste chat records to the agent:
 
 ```text
 Use lake-skill, analyze my chat records. Give me the action card first.
 ```
+
+### Tell the agent the file location
+
+If chat records are already exported as files (CSV, TXT, SQLite), tell the agent the file path:
+
+```text
+Use lake-skill, analyze the chat records in this file: D:\chats\chat.csv. Give me the action card first.
+```
+
+### Preprocess locally then upload
+
+For privacy-sensitive data, redact first:
+
+```bash
+lake-skill redact --file chat.jsonl --out chat.redacted.jsonl --privacy-mode cloud-safe
+```
+
+Then tell the agent to read the redacted file.
+
+Not sure? Install, paste one chat, try it once. 5 minutes to know.
+
+## Features
+
+### Data Sources
+
+| Source | Format | Notes |
+|---|---|---|
+| WeChat | WeChatDataAnalysis export (TXT/JSON/SQLite) | Recommended, richest data |
+| Generic chat | CSV / TXT / JSONL | Most export tools default format |
+| Voice transcripts | SRT / VTT | Timestamped speech recognition |
+| OCR text | JSONL / CSV | Text extracted from screenshots |
+| Direct paste | Plain text | Fastest way to test |
+
+### Analysis Capabilities
+
+| Capability | Description |
+|---|---|
+| Action card | First screen answers "what do I do now" with evidence backing |
+| Evidence report | 9-layer structure: card → situation → timeline → portraits → patterns → attachment → advice → uncertainty |
+| Coaching mode | Follow-up questions with multiple tone drafts |
+| Data readiness | doctor 3-tier: local observation / action card / full report |
+| Incremental update | New chat records auto-merge into existing analysis |
+| Conversation correction | Say "they wouldn't say that" — instant update |
+
+### Privacy
+
+- Local redaction: `lake-skill redact` strips names, phones, addresses
+- Leak check: `lake-skill check-leaks` scans for residual private info
+- Bundle upload: `lake-skill bundle` only packages redacted artifacts
+- Public demo: `lake-skill demo` generates synthetic data, no real chats
 
 ## What It Covers
 
