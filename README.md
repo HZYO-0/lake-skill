@@ -100,7 +100,7 @@ npx skills add HZYO-0/lake-skill -y
 仓库地址：https://github.com/HZYO-0/lake-skill.git
 ```
 
-从微信导出聊天记录？用 [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis)（GitHub 1.4k stars）解密微信数据库，导出后导入 LakeSkill。
+从微信导出聊天记录？用 [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis)（GitHub 1.4k stars）解密**你自己的**微信数据库，导出后导入 LakeSkill。仅用于解密你本人的数据，不要解密他人的聊天记录。
 
 更多安装方式（Codex、Claude Code、手动、ChatGPT GPT）见 [INSTALL.md](INSTALL.md)。
 

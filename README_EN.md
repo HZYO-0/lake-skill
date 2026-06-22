@@ -101,7 +101,7 @@ Please find LakeSkill on GitHub and install it into my local agent runtime.
 Repository: https://github.com/HZYO-0/lake-skill.git
 ```
 
-Exporting from WeChat? Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) (GitHub 1.4k stars) to decrypt WeChat databases, export, then import into LakeSkill.
+Exporting from WeChat? Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) (GitHub 1.4k stars) to decrypt **your own** WeChat database, export, then import into LakeSkill. Only decrypt data you own — do not access others' chat records.
 
 More install options (Codex, Claude Code, manual, ChatGPT GPT): [INSTALL.md](INSTALL.md).
 

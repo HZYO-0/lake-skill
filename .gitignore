@@ -35,6 +35,8 @@ private/
 real_data/
 chat_logs/
 analyses/
+lake_report_*.md
+output/
 voice/
 screenshots/
 transcripts/

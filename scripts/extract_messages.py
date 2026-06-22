@@ -58,7 +58,7 @@ def parse_timestamp(time_text):
 def format_message(msg):
     """Format a single message for output."""
     time_text = msg["createTimeText"][:16]  # YYYY-MM-DD HH:MM
-    sender = "Zy" if msg.get("isSent", False) else "Tf"
+    sender = "A" if msg.get("isSent", False) else "B"
     render_type = msg.get("renderType", "text")
     content = msg.get("content", "").strip()
 
