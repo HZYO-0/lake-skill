@@ -23,6 +23,8 @@ timestamp,sender,receiver,content
 
 **Format**: `YYYY-MM-DD HH:MM:SS 发送者: 内容`
 
+**Recommended source**: [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) — decrypt WeChat 4.x databases and export as TXT. Only decrypt your own data.
+
 **Example**:
 ```
 2025-05-21 22:13:05 张三: 今天其实有点想你
@@ -37,6 +39,8 @@ timestamp,sender,receiver,content
 - Must be readable plaintext SQLite
 - No encryption or key extraction
 - User must have legitimate access
+
+**Recommended source**: [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) decrypted databases work directly — LakeSkill auto-detects the message table schema.
 
 **Schema detection**: LakeSkill automatically detects message tables based on column names.
 
