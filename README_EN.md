@@ -1,30 +1,27 @@
 # LakeSkill
 
-> A calm relationship mirror for chat evidence.  
-> Not a partner simulator, not a certainty machine.
+> *"I kept asking AI 'does my crush like me or not?' It always gave a confident answer, but the more I read, the more anxious I got. LakeSkill made me realize — it should have started with 'not enough evidence.'"*
+
+**Don't let AI guess whether they love you. Let the chat evidence speak for itself.**
 
 [中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md)
 
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
 
-LakeSkill is an evidence-based relationship chat analysis Skill for agent runtimes such as Codex, Claude Code, and OpenCode, with an optional privacy-first local preprocessing CLI. It does not roleplay your partner, ex, coworker, or any specific person. It places chat records on a calmer surface: evidence, timing, signals, boundaries, confidence, and what to do next.
+Paste a chat log and LakeSkill will:
 
-Current versions:
+- Tell you **what the evidence supports** and what it doesn't — no guessing
+- Give you an **action card**: what to do this week, what to avoid, what to say
+- Tag every claim with an **evidence ID and confidence level**; downgrades when evidence is thin
 
-| Component | Version | Notes |
-|---|---:|---|
-| Skill framework | 0.10.0 | `skills/lake-skill/SKILL.md` |
-| Python CLI package | 0.10.0 | Local preprocessing tool named `lake-skill` |
-| Install path | `skills/lake-skill/` | Canonical GitHub Skill package |
+> ⚠️ LakeSkill does not roleplay your partner, confirm their true feelings, create emotional dependency, or provide manipulation tactics.
 
-## Why LakeSkill
+## See It In Action
 
-A lake can work like a mirror when the surface is still. Relationship interpretation often fails when the surface is not still: anxiety turns one short reply into a conclusion, ambiguity becomes certainty, and a single moment erases the timeline around it.
+### Scenario 1: Paste a chat
 
-LakeSkill is designed to slow that down. It separates stronger relationship signals from background noise, keeps claims tied to evidence IDs, marks uncertainty, and gives a low-pressure action card before any long report.
-
-## 30-Second Demo
+Input:
 
 ```text
 Use lake-skill to analyze this chat. My goal is to know what to do next.
@@ -34,7 +31,7 @@ Use lake-skill to analyze this chat. My goal is to know what to do next.
 [2026-06-02 09:10] Them: Do you still have that document from yesterday?
 ```
 
-LakeSkill starts with an action card:
+The first thing you see is not a personality report. It's an action card:
 
 ```markdown
 ## Start Here: Lake Mirror Action Card
@@ -62,60 +59,34 @@ Confidence: low to medium. The sample is too short for a stable relationship-lev
 "I think I was a bit sensitive earlier. I did not mean to pressure you. I will send the document first, and we can talk when you are less busy."
 ```
 
-## What You Get
+### Scenario 2: Follow-up questions
 
-Open the report and the first thing you see is not a personality analysis. It is an action card:
-
-- **What to do right now**: hold steady, repair, gently push, or step back — backed by evidence, not guesswork.
-- **Which claims are credible**: every conclusion carries an evidence ID, confidence level, and counterevidence so you know what is grounded and what is emotional amplification.
-- **3 concrete actions this week**: specific moves, things to avoid, and ready-to-send messages — no need to guess phrasing.
-
-LakeSkill does not provide medical or mental-health judgement, manipulation tactics, deterministic claims about another person's intent, relationship outcome prediction, revival-style simulation, database decryption, or access-control bypass.
-
-## Who Is This For
-
-| You are | Shortest path | You get |
-|---|---|---|
-| Non-technical user | Install Skill, paste a short chat | Local observations, reply drafts, low-risk action card |
-| Agent user | Say "use lake-skill, give me the action card first" | Action card, evidence report, message drafts, coaching |
-| Privacy-sensitive user | CLI redact, segment, doctor, then upload | Pre-upload readiness check, evidence index, full report |
-
-Not sure which path? Install the Skill, paste one chat, try it once. 5 minutes to know if it fits.
-
-## Why Trust It
-
-| Mechanism | Purpose |
-|---|---|
-| Signal ledger first | Extract relationship signals before writing conclusions |
-| T1-T4 weighting | Relationship definitions, refusals, boundaries, and user corrections outrank daily statistics |
-| Timeline first | Prevent early refusals from erasing later changes, or later ambiguity from erasing earlier boundaries |
-| Multi-factor interpretation | Avoid collapsing conclusions into "likes me / does not like me" or "avoidant / not avoidant" |
-| Reliability audit | Check T1 coverage, T4 overreach, single-factor claims, counterevidence, and alternatives |
-| Privacy-first CLI | Redact, segment, summarize, index, check readiness, and bundle sensitive data locally before upload |
-
-## CLI Helpers
-
-```bash
-lake-skill demo --out examples/social_demo
-lake-skill intake --out work --work-mode practical
-lake-skill doctor --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work
-lake-skill bundle --source work --out upload_bundle
-lake-skill audit analyses_or_report_dir
-lake-skill report-lint analyses_or_report_dir
+```text
+You: What did that message mean?
 ```
 
-- `demo` creates synthetic public-safe assets for screenshots, scripts, short-video recordings, and README examples.
-- `intake` reduces context-gathering turns.
-- `doctor` labels readiness as local observation, action card, or full report.
-- `bundle` collects upload-ready redacted files and writes `upload_readme.md`.
+```markdown
+The surface meaning is a practical request, but combined with "been busy lately," it may be testing whether you're still available.
+Evidence: E-20260602-001
+Confidence: low. Alternative explanation: they may genuinely just need the document.
+```
 
-Want to post on social media or make a tutorial? Generate public-safe synthetic assets in one command:
+### Scenario 3: When evidence is thin
+
+```text
+You: Do they like me or not?
+```
+
+```markdown
+Current data is insufficient to determine relationship nature. The 3 messages you provided contain no confession, rejection, or relationship definition signals.
+Suggested input: more daily interactions, conflict scenarios, conversations they initiated.
+```
+
+Want to make screenshots for social media or recording tutorials? Generate public-safe synthetic assets:
 
 ```bash
 lake-skill demo --out examples/social_demo
 ```
-
-This also creates `examples/social_demo/social_assets/` with Xiaohongshu carousel copy, caption drafts, Douyin recording scripts, and a recording checklist.
 
 ## Install
 
@@ -123,52 +94,52 @@ This also creates `examples/social_demo/social_assets/` with Xiaohongshu carouse
 npx skills add HZYO-0/lake-skill -y
 ```
 
-Or ask an AI agent with web and terminal access:
+Or ask an AI agent to install it:
 
 ```text
 Please find LakeSkill on GitHub and install it into my local agent runtime.
 Repository: https://github.com/HZYO-0/lake-skill.git
-After installation, confirm that skills/lake-skill/SKILL.md is available.
 ```
 
-### From WeChat (WeChatDataAnalysis)
+Exporting from WeChat? Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt and export, then import into LakeSkill. Guide: [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md).
 
-Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt WeChat 4.x databases and export chat records, then import into LakeSkill.
+More install options (Codex, Claude Code, manual, ChatGPT GPT): [INSTALL.md](INSTALL.md).
 
-1. Get the decryption key: [wx_key](https://github.com/ycccccccy/wx_key)
-2. Install WeChatDataAnalysis, decrypt the database
-3. Export as TXT, then import: `lake-skill ingest --file chat.txt --type txt --self-name Me --target-name Them --out work/raw_messages.jsonl`
+## How To Use
 
-Full guide: [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md)
+| You are | Shortest path | You get |
+|---|---|---|
+| Non-technical user | Install, paste a short chat | Local observations, reply drafts, action card |
+| Agent user | Say "use lake-skill, give me the action card first" | Action card, evidence report, message drafts |
+| Privacy-sensitive user | CLI redact locally, then upload | Data readiness check, evidence index, full report |
 
-The installable Skill lives at:
+Not sure? Install, paste one chat, try it once. 5 minutes to know.
 
 ```text
-skills/lake-skill/
+Use lake-skill, analyze my chat records. Give me the action card first.
 ```
 
-For local preprocessing:
+## What It Covers
 
-```bash
-git clone https://github.com/HZYO-0/lake-skill.git
-cd lake-skill
-pip install -e ".[dev]"
-lake-skill init ./my_project
-```
+Ambiguous flirting, relationship repair, cold-streak review, boundary communication, message drafts, incremental updates — all using the same evidence framework.
 
-Typical local pipeline:
+Does not do: medical diagnosis, manipulation tactics, relationship outcome prediction, database decryption.
 
-```bash
-lake-skill ingest --file input/chat.csv --type csv --self-name Me --target-name Them --out work/raw_messages.jsonl
-lake-skill redact --file work/raw_messages.jsonl --out work/messages.redacted.jsonl --privacy-mode cloud-safe
-lake-skill segment --file work/messages.redacted.jsonl --out work/sessions.redacted.jsonl
-lake-skill digest --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/digest.redacted.md
-lake-skill evidence --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work/evidence.redacted.jsonl
-lake-skill doctor --messages work/messages.redacted.jsonl --sessions work/sessions.redacted.jsonl --out work
-lake-skill bundle --source work --out upload_bundle
-```
+## Why Trust It
 
-See [INSTALL.md](INSTALL.md), [docs/quickstart.md](docs/quickstart.md), and [docs/platform_compatibility.md](docs/platform_compatibility.md) for platform-specific setup.
+1. **Evidence first, conclusions second**: every claim must have an evidence ID; without it, it's a guess.
+2. **Downgrade when uncertain**: when evidence is thin, it gives low-risk observations instead of forcing a full judgment.
+3. **Every conclusion has counterevidence**: not just one answer, but what conditions might prove it wrong.
+
+If evidence is insufficient, LakeSkill will explicitly say "current data is insufficient" rather than hiding behind vague wording.
+
+## Why "Lake Mirror"
+
+A lake works like a mirror. Relationship evidence gets reflected first, not amplified by emotion.
+
+In Chinese poetry, lakes carry stories of approach, waiting, missing, and reuniting.
+
+Before looking outward for answers, find your own steadiness first.
 
 ## Project Structure
 
