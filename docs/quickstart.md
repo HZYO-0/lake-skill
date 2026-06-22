@@ -31,10 +31,10 @@ Use this when you have enough messages for a real action card.
 
 Supported inputs:
 
-- TXT WeChat exports
+- TXT WeChat exports (from [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) or manual copy)
 - CSV/TSV tables
 - JSONL messages
-- Plaintext SQLite databases
+- Plaintext SQLite databases (WeChatDataAnalysis decrypted DBs work directly)
 - SRT/VTT voice transcripts
 - OCR transcripts after text extraction
 
