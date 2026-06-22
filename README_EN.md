@@ -67,7 +67,7 @@ Confidence: low to medium. The sample is too short for a stable relationship-lev
 Open the report and the first thing you see is not a personality analysis. It is an action card:
 
 - **What to do right now**: hold steady, repair, gently push, or step back — backed by evidence, not guesswork.
-- **Which claims are可信**: every conclusion carries an evidence ID, confidence level, and counterevidence so you know what is grounded and what is emotional amplification.
+- **Which claims are credible**: every conclusion carries an evidence ID, confidence level, and counterevidence so you know what is grounded and what is emotional amplification.
 - **3 concrete actions this week**: specific moves, things to avoid, and ready-to-send messages — no need to guess phrasing.
 
 LakeSkill does not provide medical or mental-health judgement, manipulation tactics, deterministic claims about another person's intent, relationship outcome prediction, revival-style simulation, database decryption, or access-control bypass.
@@ -130,6 +130,16 @@ Please find LakeSkill on GitHub and install it into my local agent runtime.
 Repository: https://github.com/HZYO-0/lake-skill.git
 After installation, confirm that skills/lake-skill/SKILL.md is available.
 ```
+
+### From WeChat (WeChatDataAnalysis)
+
+Use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt WeChat 4.x databases and export chat records, then import into LakeSkill.
+
+1. Get the decryption key: [wx_key](https://github.com/ycccccccy/wx_key)
+2. Install WeChatDataAnalysis, decrypt the database
+3. Export as TXT, then import: `lake-skill ingest --file chat.txt --type txt --self-name Me --target-name Them --out work/raw_messages.jsonl`
+
+Full guide: [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md)
 
 The installable Skill lives at:
 

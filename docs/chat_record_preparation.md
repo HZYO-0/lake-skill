@@ -86,6 +86,23 @@ Upload:
 - `work/evidence.redacted.jsonl`
 - `work/conversations.jsonl`
 
+### D. From WeChat (WeChatDataAnalysis)
+
+If your chat records are in WeChat, use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt and export them first.
+
+1. Get the decryption key with [wx_key](https://github.com/ycccccccy/wx_key)
+2. Install WeChatDataAnalysis and decrypt the database
+3. Export chat records as TXT
+4. Import into LakeSkill:
+
+```bash
+lake-skill ingest --file exported_chat.txt --type txt --self-name 我 --target-name 对方 --out work/raw_messages.jsonl
+```
+
+Then continue with the standard pipeline (redact → segment → doctor → bundle).
+
+Full guide: [docs/wechat_data_analysis_guide.md](wechat_data_analysis_guide.md)
+
 ---
 
 ## Context To Provide With The Data

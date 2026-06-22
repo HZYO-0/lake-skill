@@ -102,6 +102,19 @@ See [docs/chat_record_preparation.md](docs/chat_record_preparation.md).
 
 ---
 
+## Getting WeChat Data
+
+If your chat records are in WeChat, use [WeChatDataAnalysis](https://github.com/LifeArchiveProject/WeChatDataAnalysis) to decrypt and export them:
+
+1. Get the decryption key: [wx_key](https://github.com/ycccccccy/wx_key)
+2. Install WeChatDataAnalysis: [Releases](https://github.com/LifeArchiveProject/WeChatDataAnalysis/releases/latest)
+3. Decrypt the database and export chat records as TXT
+4. Import: `lake-skill ingest --file chat.txt --type txt --self-name 我 --target-name 对方 --out work/raw_messages.jsonl`
+
+Full guide: [docs/wechat_data_analysis_guide.md](docs/wechat_data_analysis_guide.md)
+
+---
+
 ## 4. Optional CLI Install
 
 Use the CLI when raw data is large or privacy-sensitive.
