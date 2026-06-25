@@ -74,3 +74,4 @@ examples/model_outputs/*.md
 .claude/
 .codex/
 .opencode/
+.mimocode/
