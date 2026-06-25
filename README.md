@@ -4,10 +4,14 @@
 
 **别让 AI 猜 TA 爱不爱你。让聊天证据自己说话。**
 
-[English](README_EN.md) | [安装指南](INSTALL.md) | [快速开始](docs/quickstart.md) | [聊天记录准备](docs/chat_record_preparation.md)
-
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
+[![PyPI version](https://img.shields.io/pypi/v/lake-skill.svg)](https://pypi.org/project/lake-skill/)
+[![Python versions](https://img.shields.io/pypi/pyversions/lake-skill.svg)](https://pypi.org/project/lake-skill/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/HZYO-0/lake-skill.svg?style=social)](https://github.com/HZYO-0/lake-skill/stargazers)
+
+[English](README_EN.md) | [安装指南](INSTALL.md) | [快速开始](docs/quickstart.md) | [聊天记录准备](docs/chat_record_preparation.md) | [FAQ](docs/FAQ.md)
 
 粘贴一段聊天记录，LakeSkill 会：
 

@@ -781,6 +781,183 @@ def intake(
 
 
 @app.command()
+def process(
+    file: str = typer.Option(..., "--file", "-f", help="Input chat file path"),
+    out: str = typer.Option("work", "--out", "-o", help="Output directory"),
+    privacy_mode: str = typer.Option("cloud-safe", "--privacy-mode", "-p", help="Privacy mode (local-raw, local-safe, cloud-safe)"),
+    self_name: Optional[str] = typer.Option(None, "--self-name", help="Name of self user"),
+    target_name: Optional[str] = typer.Option(None, "--target-name", help="Name of target user"),
+    time_gap: float = typer.Option(6.0, "--time-gap", help="Session time gap threshold (hours)"),
+    export_mode: str = typer.Option("conversations", "--export-mode", help="Export mode: summary, conversations, full"),
+    skip_bundle: bool = typer.Option(False, "--skip-bundle", help="Skip creating upload bundle"),
+    skip_doctor: bool = typer.Option(False, "--skip-doctor", help="Skip data readiness check"),
+) -> None:
+    """Run full pipeline: ingest → redact → segment → digest → evidence → intake → doctor → export → bundle."""
+    from .adapters.generic_csv import GenericCSVAdapter
+    from .adapters.generic_jsonl import GenericJSONLAdapter
+    from .adapters.wechat_txt import WeChatTXTAdapter
+    from .adapters.wechat_sqlite import WeChatSQLiteAdapter
+    from .adapters.voice_transcript import VoiceTranscriptAdapter
+    from .privacy.modes import validate_privacy_mode
+    from .privacy.redactor import create_redactor
+    from .jsonl_utils import read_jsonl, write_jsonl, write_jsonl_models
+    from .schema import Message, SenderRole as SenderRoleEnum
+    from .segmentation.sessionizer import segment_sessions
+    from .reports.digest import generate_digest
+    from .evidence.indexer import index_evidence, save_evidence_index
+    from .doctor_checks import run_doctor_checks, format_readiness_report
+    from .intake_io import save_intake_yaml, save_intake_md
+    from .schema import IntakeCard, WorkMode
+    from .bundle import bundle_upload_artifacts
+
+    file_path = Path(file)
+    out_dir = Path(out)
+
+    if not file_path.exists():
+        rprint(f"[red]Error: File not found: {file_path}[/red]")
+        raise typer.Exit(1)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rprint("[bold blue]LakeSkill Pipeline[/bold blue]")
+    rprint(f"  Input: {file_path}")
+    rprint(f"  Output: {out_dir}")
+    rprint()
+
+    # Step 1: Ingest
+    rprint("[bold]Step 1/8: Ingest[/bold]")
+    suffix = file_path.suffix.lower()
+    if suffix == ".csv":
+        adapter = GenericCSVAdapter(warnings_path=out_dir / "parse_warnings.jsonl", self_name=self_name, target_name=target_name)
+    elif suffix in (".txt", ".text"):
+        adapter = WeChatTXTAdapter(warnings_path=out_dir / "parse_warnings.jsonl", self_name=self_name, target_name=target_name)
+    elif suffix in (".jsonl", ".json"):
+        adapter = GenericJSONLAdapter(warnings_path=out_dir / "parse_warnings.jsonl")
+    elif suffix in (".db", ".sqlite", ".sqlite3"):
+        adapter = WeChatSQLiteAdapter(warnings_path=out_dir / "parse_warnings.jsonl")
+    elif suffix in (".srt", ".vtt"):
+        adapter = VoiceTranscriptAdapter(warnings_path=out_dir / "parse_warnings.jsonl", sender_role=SenderRoleEnum.target)
+    else:
+        rprint(f"[red]Error: Unsupported file format: {suffix}[/red]")
+        raise typer.Exit(1)
+
+    raw_path = out_dir / "raw_messages.jsonl"
+    count = adapter.process(file_path, raw_path)
+    rprint(f"  [green]✓[/green] {count} messages ingested")
+
+    # Step 2: Redact
+    rprint("[bold]Step 2/8: Redact[/bold]")
+    mode = validate_privacy_mode(privacy_mode)
+    redactor = create_redactor(mode)
+    messages_data = list(read_jsonl(raw_path))
+    redacted_messages = [redactor.redact_message(msg) for msg in messages_data]
+    redacted_path = out_dir / "redacted_messages.jsonl"
+    write_jsonl(redacted_path, redacted_messages)
+    rprint(f"  [green]✓[/green] {len(redacted_messages)} messages redacted ({privacy_mode})")
+
+    # Step 3: Segment
+    rprint("[bold]Step 3/8: Segment[/bold]")
+    messages = [Message(**data) for data in read_jsonl(redacted_path)]
+    sessions = segment_sessions(messages, time_gap_hours=time_gap)
+    sessions_path = out_dir / "sessions.jsonl"
+    write_jsonl_models(sessions_path, sessions)
+    rprint(f"  [green]✓[/green] {len(sessions)} sessions created")
+
+    # Step 4: Digest
+    rprint("[bold]Step 4/8: Digest[/bold]")
+    digest_path = out_dir / "digest.md"
+    generate_digest(messages, sessions, str(digest_path))
+    rprint("  [green]✓[/green] Digest generated")
+
+    # Step 5: Evidence
+    rprint("[bold]Step 5/8: Evidence[/bold]")
+    evidence_list = index_evidence(messages, sessions)
+    evidence_path = out_dir / "evidence_index.jsonl"
+    save_evidence_index(evidence_list, str(evidence_path))
+    rprint(f"  [green]✓[/green] {len(evidence_list)} evidence items indexed")
+
+    # Step 6: Intake
+    rprint("[bold]Step 6/8: Intake[/bold]")
+    card = IntakeCard(
+        privacy_mode=privacy_mode,
+        work_mode=WorkMode.auto,
+        self_name=self_name or "",
+        target_name=target_name or "",
+    )
+    save_intake_yaml(card, out_dir / "lakeskill_intake.yaml")
+    save_intake_md(card, out_dir / "lakeskill_intake.md")
+    rprint("  [green]✓[/green] Intake files generated")
+
+    # Step 7: Doctor
+    if not skip_doctor:
+        rprint("[bold]Step 7/8: Doctor[/bold]")
+        results = run_doctor_checks(messages, sessions)
+        report_content = format_readiness_report(results)
+        (out_dir / "data_readiness.md").write_text(report_content, encoding="utf-8")
+        for check in results["checks"]:
+            icon = "[green]✓[/green]" if check["passed"] else "[yellow]![/yellow]"
+            rprint(f"  {icon} {check['name']}: {check['summary']}")
+        rprint(f"  Overall: [bold]{results['overall']}[/bold]")
+    else:
+        rprint("[bold]Step 7/8: Doctor[/bold] [dim](skipped)[/dim]")
+
+    # Step 8: Export
+    rprint("[bold]Step 8/8: Export[/bold]")
+    export_path = out_dir / "export.jsonl"
+    msg_lookup = {m.message_id: m for m in messages}
+    import json
+
+    with open(export_path, "w", encoding="utf-8") as f:
+        for session in sessions:
+            session_messages = []
+            for msg_id in session.message_ids:
+                msg = msg_lookup.get(msg_id)
+                if msg:
+                    text = msg.text_redacted or msg.text or ""
+                    session_messages.append({
+                        "message_id": msg.message_id,
+                        "speaker": msg.sender_role.value,
+                        "text": text,
+                        "timestamp": msg.timestamp.isoformat(),
+                        "message_type": msg.message_type.value,
+                    })
+            entry = {
+                "session_id": session.session_id,
+                "start": session.start.isoformat(),
+                "end": session.end.isoformat(),
+                "message_count": len(session_messages),
+                "self_count": session.self_count,
+                "target_count": session.target_count,
+                "topic": session.topic,
+                "episode_type": session.episode_type,
+                "risk_level": session.risk_level,
+                "messages": session_messages,
+            }
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    rprint(f"  [green]✓[/green] Exported {len(sessions)} conversations ({export_mode})")
+
+    # Bundle
+    if not skip_bundle:
+        rprint()
+        rprint("[bold]Creating upload bundle...[/bold]")
+        try:
+            copied = bundle_upload_artifacts(out_dir, out_dir / "upload_bundle")
+            rprint(f"  [green]✓[/green] Bundle created with {len(copied)} files")
+        except Exception as e:
+            rprint(f"  [yellow]![/yellow] Bundle creation failed: {e}")
+
+    # Summary
+    rprint()
+    rprint("[bold green]Pipeline complete![/bold green]")
+    rprint(f"  Output directory: {out_dir}")
+    rprint("  Key files:")
+    rprint(f"    {out_dir / 'digest.md'}")
+    rprint(f"    {out_dir / 'evidence_index.jsonl'}")
+    rprint(f"    {out_dir / 'export.jsonl'}")
+    if not skip_bundle:
+        rprint(f"    {out_dir / 'upload_bundle'}")
+
+
+@app.command()
 def doctor(
     messages: str = typer.Option(..., "--messages", "-m", help="Messages JSONL file"),
     sessions: Optional[str] = typer.Option(None, "--sessions", "-s", help="Sessions JSONL file (optional)"),

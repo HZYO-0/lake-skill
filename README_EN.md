@@ -4,10 +4,14 @@
 
 **Don't let AI guess whether they love you. Let the chat evidence speak for itself.**
 
-[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md)
-
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
+[![PyPI version](https://img.shields.io/pypi/v/lake-skill.svg)](https://pypi.org/project/lake-skill/)
+[![Python versions](https://img.shields.io/pypi/pyversions/lake-skill.svg)](https://pypi.org/project/lake-skill/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/HZYO-0/lake-skill.svg?style=social)](https://github.com/HZYO-0/lake-skill/stargazers)
+
+[中文](README.md) | [Install](INSTALL.md) | [Quickstart](docs/quickstart.md) | [Chat Record Preparation](docs/chat_record_preparation.md) | [FAQ](docs/FAQ.md)
 
 Paste a chat log and LakeSkill will:
 
