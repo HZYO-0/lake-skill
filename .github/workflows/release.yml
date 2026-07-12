@@ -3,6 +3,17 @@ name: Release
 on:
   push:
     tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Existing or new release tag to create/update, for example v0.12.0
+        required: true
+        type: string
+      ref:
+        description: Code ref to package. Use main to backfill assets for an existing release.
+        required: true
+        default: main
+        type: string
 
 jobs:
   release:
@@ -12,6 +23,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -45,7 +58,10 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
         files: |
           dist/skill.zip
           dist/skill.zip.sha256
+        fail_on_unmatched_files: true
+        overwrite_files: true
         generate_release_notes: true
