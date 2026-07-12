@@ -22,9 +22,39 @@ jobs:
       contents: write
 
     steps:
+    - name: Normalize release inputs
+      id: release_inputs
+      shell: bash
+      env:
+        RAW_TAG_NAME: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+        RAW_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
+      run: |
+        normalize_tag() {
+          printf '%s' "$1" \
+            | tr -d '\r' \
+            | sed -E 's/^[[:space:]]*(tag_name|tag)[[:space:]]*=[[:space:]]*//; s/^[[:space:]]+//; s/[[:space:]]+$//'
+        }
+        normalize_ref() {
+          printf '%s' "$1" \
+            | tr -d '\r' \
+            | sed -E 's/^[[:space:]]*ref[[:space:]]*=[[:space:]]*//; s/^[[:space:]]+//; s/[[:space:]]+$//'
+        }
+        tag_name="$(normalize_tag "$RAW_TAG_NAME")"
+        ref="$(normalize_ref "$RAW_REF")"
+        if [ -z "$tag_name" ] || printf '%s' "$tag_name" | grep -q '[[:space:]]'; then
+          echo "::error::Invalid release tag: '$tag_name'"
+          exit 1
+        fi
+        if [ -z "$ref" ]; then
+          echo "::error::Invalid checkout ref: '$ref'"
+          exit 1
+        fi
+        echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+        echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
+        ref: ${{ steps.release_inputs.outputs.ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -55,10 +85,14 @@ jobs:
     - name: Generate checksums
       run: sha256sum dist/skill.zip > dist/skill.zip.sha256
 
+    - name: Validate release tag exists
+      shell: bash
+      run: git ls-remote --exit-code --tags origin "refs/tags/${{ steps.release_inputs.outputs.tag_name }}"
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+        tag_name: ${{ steps.release_inputs.outputs.tag_name }}
         files: |
           dist/skill.zip
           dist/skill.zip.sha256
