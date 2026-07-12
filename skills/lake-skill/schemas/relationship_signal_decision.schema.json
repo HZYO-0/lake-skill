@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LakeSkill Relationship Signal Decision",
+  "type": "object",
+  "required": [
+    "event_id",
+    "decision",
+    "tier",
+    "decision_reason",
+    "consensus_state",
+    "boundary_effect",
+    "conditions",
+    "counterevidence_ids",
+    "must_not_infer"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["confirmed", "downgraded", "excluded"]},
+    "tier": {"type": ["string", "null"], "enum": ["T1", "T2", "T3", "T4", null]},
+    "decision_reason": {"type": "string", "minLength": 1},
+    "consensus_state": {"enum": ["aligned", "divergent", "open", "unanswered", "unclear"]},
+    "boundary_effect": {"type": "string"},
+    "conditions": {"type": "array", "items": {"type": "string"}},
+    "counterevidence_ids": {"type": "array", "items": {"type": "string"}},
+    "must_not_infer": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

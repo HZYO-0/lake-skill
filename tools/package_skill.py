@@ -48,7 +48,7 @@ def copy_skill_package(out: Path) -> None:
     out.mkdir(parents=True)
     shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
 
-    for resource in ("references", "assets", "agents"):
+    for resource in ("prompts", "schemas", "references", "assets", "agents"):
         src = SKILL_PACKAGE_DIR / resource
         if src.exists():
             shutil.copytree(src, out / resource, dirs_exist_ok=True)
@@ -62,6 +62,11 @@ def package_chatgpt() -> None:
     shutil.copy2(SKILL_PACKAGE_DIR / "SKILL.md", out / "SKILL.md")
 
     fw_out = out / "frameworks"
+    for resource in ("prompts", "schemas", "references", "assets", "agents"):
+        src = SKILL_PACKAGE_DIR / resource
+        if src.exists():
+            shutil.copytree(src, out / resource, dirs_exist_ok=True)
+
     fw_out.mkdir(exist_ok=True)
     for fw in FRAMEWORKS:
         src = FRAMEWORKS_DIR / fw

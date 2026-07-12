@@ -7,6 +7,20 @@ from pathlib import Path
 
 
 DEFAULT_BUNDLE_FILES = [
+    "digest.md",
+    "sessions.jsonl",
+    "evidence_index.jsonl",
+    "export.jsonl",
+    "relationship_signal_candidates.jsonl",
+    "relationship_signal_decisions.jsonl",
+    "relationship_signal_ledger.jsonl",
+    "relationship_discussion_summary.md",
+    "analysis_windows.jsonl",
+    "interaction_stats.json",
+    "relationship_analysis.json",
+    "relationship_analysis.md",
+    "relationship_analysis.html",
+    "data_readiness.md",
     "digest.redacted.md",
     "sessions.redacted.jsonl",
     "evidence.redacted.jsonl",

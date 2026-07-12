@@ -1,10 +1,10 @@
 [project]
 name = "lake-skill"
-version = "0.10.0"
+version = "0.12.0"
 description = "Evidence-based intimate relationship chat analysis. Every claim has an evidence ID. Privacy-first."
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["chat-analysis", "relationship", "evidence-based", "privacy-first", "wechat"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -47,7 +47,7 @@ lake-skill = "lake_skill.cli:app"
 
 [build-system]
 requires = ["setuptools>=68.0"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.setuptools.packages.find]
 where = ["cli"]

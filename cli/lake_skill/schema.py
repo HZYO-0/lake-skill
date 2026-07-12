@@ -133,6 +133,53 @@ class Evidence(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now)
 
 
+class RelationshipSignalCandidate(BaseModel):
+    """High-recall relationship-discussion event awaiting semantic review."""
+
+    event_id: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    candidate_type: str
+    speaker: str
+    direction: str = "unknown"
+    quote: str
+    context_message_ids: list[str] = Field(default_factory=list)
+    response_summary: str = ""
+    conditions: list[str] = Field(default_factory=list)
+    time_anchor: list[str] = Field(default_factory=list)
+    later_followup: list[dict] = Field(default_factory=list)
+    polarity: str = "neutral"
+    confidence: float = 0.0
+    classification_status: str = "pending_semantic_review"
+    counterevidence_ids: list[str] = Field(default_factory=list)
+    session_id: str = ""
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+class RelationshipSignalDecision(BaseModel):
+    """Skill-authored semantic decision for exactly one candidate event."""
+
+    event_id: str
+    decision: str
+    tier: Optional[str] = None
+    decision_reason: str
+    consensus_state: str = "unclear"
+    boundary_effect: str = "none"
+    conditions: list[str] = Field(default_factory=list)
+    counterevidence_ids: list[str] = Field(default_factory=list)
+    must_not_infer: list[str] = Field(default_factory=list)
+
+
+class RelationshipSignalLedgerEntry(RelationshipSignalCandidate):
+    """Candidate plus its explicit semantic review decision."""
+
+    decision: str
+    tier: Optional[str] = None
+    decision_reason: str
+    consensus_state: str = "unclear"
+    boundary_effect: str = "none"
+    must_not_infer: list[str] = Field(default_factory=list)
+
+
 class Session(BaseModel):
     """Session schema."""
 

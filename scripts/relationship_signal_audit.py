@@ -91,7 +91,7 @@ def normalize_tier(value: object) -> str:
 
 def record_evidence_id(record: dict) -> str:
     """Return the evidence ID from a ledger/correction record."""
-    return str(record.get("evidence_id") or record.get("id") or "").strip()
+    return str(record.get("evidence_id") or record.get("id") or record.get("event_id") or "").strip()
 
 
 def split_heading_blocks(text: str) -> list[str]:
@@ -111,27 +111,29 @@ def has_field(text: str, field: str) -> bool:
 
 
 def audit_ledger_schema(ledger: list[dict]) -> list[AuditIssue]:
-    """Validate minimum ledger fields for deterministic auditability."""
+    """Validate legacy and 0.12 ledger fields for deterministic auditability."""
     issues: list[AuditIssue] = []
-    required = [
-        "evidence_id",
-        "date",
-        "speaker",
-        "tier",
-        "signal_type",
-        "quote",
-        "local_context",
-        "later_followup",
-        "interpretation_candidates",
-    ]
     for idx, record in enumerate(ledger, 1):
         if "_audit_error" in record:
             issues.append(AuditIssue("LEDGER_JSON", record["_audit_error"]))
             continue
         eid = record_evidence_id(record) or f"record-{idx}"
+        if "event_id" in record:
+            required = [
+                "event_id", "evidence_ids", "candidate_type", "speaker", "quote",
+                "decision", "decision_reason", "consensus_state", "boundary_effect",
+                "must_not_infer",
+            ]
+        else:
+            required = [
+                "evidence_id", "date", "speaker", "tier", "signal_type", "quote",
+                "local_context", "later_followup", "interpretation_candidates",
+            ]
         for field in required:
             if field not in record or record[field] in (None, "", []):
                 issues.append(AuditIssue("LEDGER_FIELD", f"{eid} missing required field: {field}"))
+        if record.get("decision") == "excluded" and record.get("tier") is None:
+            continue
         tier = normalize_tier(record.get("tier"))
         if tier not in {"T1", "T2", "T3", "T4"}:
             issues.append(AuditIssue("LEDGER_TIER", f"{eid} has invalid tier: {record.get('tier')}"))
@@ -139,17 +141,18 @@ def audit_ledger_schema(ledger: list[dict]) -> list[AuditIssue]:
 
 
 def audit_t1_coverage(ledger: list[dict], report_text: str) -> list[AuditIssue]:
-    """Ensure all T1 ledger evidence appears in the report."""
+    """Ensure every T1 event or one of its evidence IDs appears in the report."""
     issues: list[AuditIssue] = []
     report_ids = evidence_ids(report_text)
     for record in ledger:
         if normalize_tier(record.get("tier")) != "T1":
             continue
         eid = record_evidence_id(record)
-        if eid and eid not in report_ids:
+        supporting_ids = {str(item) for item in record.get("evidence_ids", [])}
+        covered = (eid and eid in report_text) or bool(supporting_ids & report_ids)
+        if eid and not covered:
             issues.append(AuditIssue("T1_MISSING", f"T1 signal {eid} is in ledger but missing from report"))
     return issues
-
 
 def audit_t4_overreach(ledger: list[dict], report_text: str) -> list[AuditIssue]:
     """Flag relationship-claim blocks that cite T4 without T1/T2 support."""

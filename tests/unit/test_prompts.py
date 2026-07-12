@@ -53,9 +53,8 @@ def test_skill_md_has_frontmatter():
     assert len(parts) >= 3, "Frontmatter not properly closed"
     frontmatter = parts[1]
     assert "name: lake-skill" in frontmatter
-    assert "version:" in frontmatter
-    assert "user-invocable:" in frontmatter
-    assert "allowed-tools:" in frontmatter
+    keys = {line.split(":", 1)[0] for line in frontmatter.splitlines() if ":" in line}
+    assert keys == {"name", "description"}
 
 
 @pytest.mark.parametrize("filename", REQUIRED_PROMPTS)
@@ -97,12 +96,13 @@ def test_no_stale_eight_layer_reference():
         )
 
 
-def test_skill_version_is_v010():
-    """SKILL.md is bumped to the 0.10.0 reliability workflow."""
+def test_package_version_is_v012():
+    """Package version identifies the relationship-first workflow."""
+    from lake_skill import __version__
+
     content = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-    assert 'version: "0.10.0"' in content
-    assert "关系信号台账" in content
-    assert "可靠性审计" in content
+    assert __version__ == "0.12.0"
+    assert "候选置信度不是关系结论" in content
 
 
 def test_no_stale_skill_prompts_path():

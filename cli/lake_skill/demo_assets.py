@@ -10,8 +10,30 @@ from pathlib import Path
 from .evidence.indexer import index_evidence, save_evidence_index
 from .intake_io import save_intake_md, save_intake_yaml
 from .jsonl_utils import write_jsonl_models
+from .interaction_stats import compute_interaction_stats
+from .relationship_signals import (
+    extract_relationship_signal_candidates,
+    finalize_relationship_signals,
+    render_relationship_discussion_summary,
+    save_relationship_signal_candidates,
+    save_relationship_signal_ledger,
+)
+from .reports.analysis import (
+    build_relationship_analysis,
+    render_analysis_html,
+    render_analysis_markdown,
+    write_relationship_analysis,
+)
 from .reports.digest import generate_digest
-from .schema import IntakeCard, Message, MessageType, Modality, SenderRole, WorkMode
+from .schema import (
+    IntakeCard,
+    Message,
+    MessageType,
+    Modality,
+    RelationshipSignalDecision,
+    SenderRole,
+    WorkMode,
+)
 from .segmentation.sessionizer import segment_sessions
 
 
@@ -325,7 +347,145 @@ LakeSkill 湖镜做的是更克制的事：它不替你猜 TA 的心，只把聊
     )
 
 
+def _scenario_messages(key: str) -> list[Message]:
+    """Return one of four publish-safe relationship discussion scenarios."""
+    scenarios = {
+        "conditional-acceptance": [
+            ("self", "我们是什么关系", 0),
+            ("target", "我现在没办法开始", 2),
+            ("target", "等工作稳定再说", 4),
+            ("self", "明白，我不会催你", 5),
+        ],
+        "rejection-with-daily-chat": [
+            ("target", "我不喜欢你，不想和你在一起", 0),
+            ("self", "知道了，我会尊重", 1),
+            ("target", "今天吃什么", 30),
+            ("self", "面条", 31),
+        ],
+        "divergent-definition": [
+            ("self", "我觉得我们是在谈恋爱", 0),
+            ("target", "我们先做朋友，我还没把我们当男女朋友", 2),
+            ("self", "好，那我按朋友边界相处", 4),
+        ],
+        "reopening-after-breakup": [
+            ("target", "我们分手吧，到此为止", 0),
+            ("self", "我接受，会尊重你的决定", 2),
+            ("target", "我想重新讨论我们能不能复合", 60 * 24 * 20),
+            ("self", "可以先把之前的问题说清楚", 60 * 24 * 20 + 2),
+        ],
+    }
+    start = datetime(2026, 2, 1, 20, 0)
+    return [
+        Message(
+            message_id=f"{key}-{index:03d}",
+            conversation_id=f"demo-{key}",
+            source_type="synthetic",
+            timestamp=start + timedelta(minutes=minute),
+            sender_role=SenderRole(role),
+            receiver_role=SenderRole.TARGET if role == "self" else SenderRole.SELF,
+            message_type=MessageType.TEXT,
+            modality=Modality.TEXT,
+            text=text,
+            text_redacted=text,
+        )
+        for index, (role, text, minute) in enumerate(scenarios[key], 1)
+    ]
+
+
+def _demo_decision(key: str, candidate) -> RelationshipSignalDecision:
+    candidate_type = candidate.candidate_type
+    if key == "conditional-acceptance":
+        state, effect = "open", "pause_progression"
+        reason = "明确暂停当前推进，同时保留工作稳定后的开放条件。"
+    elif key == "rejection-with-daily-chat":
+        state, effect = "aligned", "stop_progression"
+        reason = "明确拒绝优先；后续日常聊天不能反向解释为隐藏好感。"
+    elif key == "divergent-definition":
+        state, effect = "divergent", "friends_only"
+        reason = "双方定义不一致，对方明确提出朋友边界。"
+    else:
+        state = "open"
+        effect = "stop_progression" if "breakup" in candidate_type else "reopen_discussion_only"
+        reason = "分手与后续重新讨论属于两个阶段，不能互相覆盖。"
+    return RelationshipSignalDecision(
+        event_id=candidate.event_id,
+        decision="confirmed",
+        tier="T1",
+        decision_reason=reason,
+        consensus_state=state,
+        boundary_effect=effect,
+        conditions=candidate.conditions,
+        must_not_infer=["不能据此推断隐藏好感", "不能承诺复合或关系结果"],
+    )
+
+
+def _write_demo_visuals(output_dir: Path) -> None:
+    shots = output_dir / "public_screenshots"
+    shots.mkdir(parents=True, exist_ok=True)
+    captions = [
+        ("01-action-card", "先看双方真正说过什么", "一分钟行动卡不替你猜心。"),
+        ("02-boundary", "明确拒绝，高于聊天热度", "日常互动不能覆盖边界。"),
+        ("03-open-condition", "条件性接受，不压成二选一", "同时保留开放条件与现实限制。"),
+        ("04-evidence", "每个结论都有原话和反证", "候选、决策、台账全程可审计。"),
+    ]
+    for name, title, subtitle in captions:
+        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500">
+<rect width="1200" height="1500" fill="#142422"/><text x="90" y="130" fill="#87d4c8" font-size="28" font-family="sans-serif" letter-spacing="6">LAKESKILL · 湖镜</text>
+<text x="90" y="420" fill="#f4f0e7" font-size="78" font-family="serif"><tspan x="90" dy="0">{title[:12]}</tspan><tspan x="90" dy="105">{title[12:]}</tspan></text>
+<line x1="90" y1="760" x2="1110" y2="760" stroke="#87d4c8"/><text x="90" y="850" fill="#d7e0dc" font-size="38" font-family="sans-serif">{subtitle}</text>
+<text x="90" y="1370" fill="#87d4c8" font-size="25" font-family="sans-serif">全部为合成数据 · 无追踪器 · 无爱情总分</text></svg>"""
+        (shots / f"{name}.svg").write_text(svg, encoding="utf-8")
+    (output_dir / "recording_storyboard.md").write_text(
+        "# 40 秒录屏分镜\n\n0–3 秒：展示“回复慢≠不爱”。\n\n"
+        "3–12 秒：运行 lake-skill demo。\n\n12–25 秒：展开关键关系讨论和证据抽屉。\n\n"
+        "25–34 秒：展示明确拒绝高于高互动统计。\n\n34–40 秒：CTA：GitHub 搜索 LakeSkill 湖镜。\n",
+        encoding="utf-8",
+    )
+
+
+def generate_product_scenarios(output_dir: Path) -> None:
+    """Generate four complete, finalized, publish-safe product demos."""
+    root = output_dir / "scenarios"
+    for key in (
+        "conditional-acceptance",
+        "rejection-with-daily-chat",
+        "divergent-definition",
+        "reopening-after-breakup",
+    ):
+        scenario_dir = root / key
+        scenario_dir.mkdir(parents=True, exist_ok=True)
+        messages = _scenario_messages(key)
+        sessions = segment_sessions(messages, time_gap_hours=6)
+        evidence = index_evidence(messages, sessions)
+        candidates = extract_relationship_signal_candidates(messages, sessions, evidence)
+        decisions = [_demo_decision(key, candidate) for candidate in candidates]
+        ledger = finalize_relationship_signals(candidates, decisions)
+        stats = compute_interaction_stats(messages, sessions)
+        analysis = build_relationship_analysis(ledger=ledger, interaction_stats=stats, mode="deep")
+
+        write_synthetic_csv(messages, scenario_dir / "synthetic_chat.csv")
+        save_relationship_signal_candidates(
+            candidates, scenario_dir / "relationship_signal_candidates.jsonl"
+        )
+        write_jsonl_models(scenario_dir / "relationship_signal_decisions.jsonl", decisions)
+        save_relationship_signal_ledger(ledger, scenario_dir / "relationship_signal_ledger.jsonl")
+        (scenario_dir / "relationship_discussion_summary.md").write_text(
+            render_relationship_discussion_summary(ledger), encoding="utf-8"
+        )
+        (scenario_dir / "interaction_stats.json").write_text(
+            json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        write_relationship_analysis(scenario_dir / "relationship_analysis.json", analysis)
+        (scenario_dir / "relationship_analysis.md").write_text(
+            render_analysis_markdown(analysis), encoding="utf-8"
+        )
+        (scenario_dir / "relationship_analysis.html").write_text(
+            render_analysis_html(analysis), encoding="utf-8"
+        )
+    _write_demo_visuals(output_dir)
+
 def generate_demo_package(output_dir: Path) -> None:
+
     """Generate a complete synthetic demo package."""
     work_dir = output_dir / "work"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -358,3 +518,4 @@ def generate_demo_package(output_dir: Path) -> None:
     generate_social_action_card(output_dir / "social_action_card_demo.md")
     generate_audit_demo_files(output_dir)
     generate_social_assets(output_dir)
+    generate_product_scenarios(output_dir)

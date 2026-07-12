@@ -1,365 +1,134 @@
 ---
 name: lake-skill
-description: "Evidence-based intimate relationship chat analysis. Generates action briefs (what to do this week, what to avoid, ready-to-send messages), personality profiles with quote anchoring, interaction pattern analysis, attachment hypotheses with evidence IDs, confidence levels, and alternative explanations. Provides coaching, message drafts, and incremental knowledge base updates."
-argument-hint: "[分析|教练|更新]"
-version: "0.10.0"
-user-invocable: true
-allowed-tools: Read, Write, Edit, Bash
+description: Evidence-based intimate relationship chat analysis for relationship definitions, rejection, conditional acceptance, boundaries, commitments, breakups, repair, personality profiles, interaction patterns, action briefs, and message drafts. Use when a user asks to analyze intimate relationship chats, determine what both people explicitly said, review relationship changes, generate a profile or next-step plan, or invokes /急, /深度, /画像, /复盘, /更新, or /改写.
 ---
 
 # LakeSkill 湖镜
 
-Evidence-based intimate relationship chat analysis.
+先找全双方真正说过的话，再判断下一步。不要读心，不要把边界解释成隐藏好感。
 
-## 激活条件
+## 输入路由
 
-**激活当**：
-- 用户粘贴或上传聊天记录并要求分析
-- 用户说 `/lake-skill` 或 "帮我分析一下我们的聊天记录"
-- 用户问 "我该怎么说" 或 "下一步怎么办"（关系上下文）
-- 用户提供 CLI 预处理产物并要求解读
-- 用户想要基于证据的沟通教练
+- /急：输出一分钟行动卡。
+- /深度：输出完整报告。
+- /画像：只在关系讨论之后输出双方画像。
+- /复盘：比较阶段变化、兑现、撤回和反证。
+- /更新：读取既有知识库并增量更新。
+- /改写：先做边界检查，再给消息草稿。
+- 未指定时默认 /急。
 
-**不激活当**：
-- 用户问一般性关系建议但没有提供数据
-- 用户要求解密数据库
-- 用户要求临床诊断（"他是不是回避型人格"）
-- 用户要求操控策略（PUA、情感勒索、嫉妒诱导）
-- 用户问非关系话题
+若用户只问一句具体回复，仍先检查已有拒绝、边界、关系定义和开放条件。
 
-## 工具使用规则
+## 强制数据顺序
 
-| 任务 | 工具 |
-|------|------|
-| 读取用户上传的文件 | Read |
-| 读取聊天记录文件（CSV/TXT/JSONL/SQLite） | Read |
-| 写入分析报告 | Write |
-| 更新知识库 | Edit |
-| 运行 CLI 工具（可选） | Bash |
-
-## 工作流
-
-在任何报告、行动卡、教练回复或消息草稿前，先遵守 `prompts/safety_notice.md`。如果材料涉及自伤、伤害他人、被威胁、被跟踪、现实暴力风险或未成年人亲密陪伴场景，优先输出安全边界、现实支持和专业求助提示，而不是继续做关系推进建议。
-
-### Step 0: 确认关系类型、分析目标与工作模式
-
-**开场声明**（每次新对话必须）：首次回复时，先说明：
-
-> 我是 LakeSkill，一个 AI 聊天分析工具，不是人类咨询师。我的分析基于你提供的聊天记录，不是对 TA 真实内心的确定判断。输入「退出」可随时结束对话。
-
-参考 `prompts/intake.md`，在 3 轮对话内收集：
-
-1. **基本信息**：关系类型、当前状态、双方称呼、时长
-2. **典型场景**：一个最近的互动场景
-3. **数据来源**：能提供什么数据
-4. **工作模式**（必选）：
-
-| 模式 | 适用场景 | 输出风格 |
-|------|---------|---------|
-| `support` | 情感支持 | 先共情，再给建议，语气温和 |
-| `practical` | 实操建议 | 先判断，再给动作，语气直接 |
-| `repair` | 关系修复 | 先分析冲突，再给修复步骤，语气谨慎 |
-| `auto` | 默认 | 根据用户消息自动判断 |
-
-每轮可跳过。收集完毕后展示确认汇总。
-
-```
-信息汇总：
-  关系类型：{type}
-  当前状态：{status}
-  你的称呼：{self_name}
-  对方称呼：{target_name}
-  时长：{duration}
-  数据来源：{source}
-  典型场景：{scene_summary}
-  工作模式：{mode}
-
-确认？（确认 / 修改 [字段名]）
-```
-
-**CLI 快捷路径**：如果用户通过 CLI 生成了 `lakeskill_intake.yaml`，直接读取该文件跳过收集轮次。如果缺少 intake 文件，按上述流程收集后生成 `lakeskill_intake.yaml` + `lakeskill_intake.md`。
-
-### Step 1: 数据导入
-
-根据用户提供的数据类型，选择处理方式：
-
-**方式 A: 直接粘贴聊天记录**
-- 解析时间戳、发送者、消息内容
-- 标准化为内部格式
-
-**方式 B: 上传文件**
-- CSV/TXT：自动检测列映射
-- JSONL：直接读取结构化数据
-- SQLite：使用 SQLite 适配器（支持 WeChatMsg/PyWxDump 导出格式）
-- PDF/图片：OCR 提取文本
-
-**方式 C: CLI 预处理产物**
-- digest.md + evidence.jsonl + sessions.jsonl
-- 直接进入分析阶段
-
-**方式 D: 增量更新**
-- 已有知识库 + 新数据
-- 参考 `prompts/merger.md` 执行增量合并
-
-### Step 2: 数据充分性评估
-
-参考 `prompts/data_assessment.md`，评估：
-
-| 维度 | 不足 | 基本 | 充分 |
-|------|------|------|------|
-| 消息量 | <30 条 | 30-100 条 | 100+ 条 |
-| 时间跨度 | <1 天 | 1-7 天 | 1+ 周 |
-| 双方参与 | 只有一方 | 严重不平衡 | 基本均衡 |
-| 场景多样性 | 只有闲聊 | 有冲突 | 冲突+修复 |
-
-- **充分** → 进入完整分析
-- **基本** → 分析但标注低置信维度
-- **不足** → 仅输出局部观察，提示补充数据
-
-### Step 3: 分析执行
-
-**3a: 关系信号台账（强制前置）**
-参考 `prompts/relationship_signal_extractor.md` 和 `prompts/signal_weighting.md`：
-- 先生成 `relationship_signal_ledger.jsonl` / `relationship_signal_ledger.md`
-- 同步生成 `contradiction_ledger.md`
-- T1 必须全量扫描：表白、拒绝、关系定义、条件性接受、边界、自我认知、未来时间线、矛盾/摇摆表达
-- T4 只做统计和语言风格背景，不能推翻 T1
-- 用户口述事件和用户纠正同等进入台账
-
-**3b: Timeline First**
-参考 `prompts/relationship_timeline_builder.md`：
-- 用 T1/T2 划分关系阶段
-- 每个阶段说明能判断什么、不能判断什么
-- 避免用早期拒绝覆盖后期条件性表达，或用后期暧昧抹掉早期边界
-
-**3c: 多因子解释**
-参考 `prompts/multi_factor_interpreter.md`：
-- 核心判断必须拆成多因子：感情/吸引、回避或自我保护、现实顾虑、愧疚、自我价值、安全/信任、用户压力
-- 禁止把结论压成"喜欢/不喜欢"或"回避/不回避"二选一
-- 如果 T1 不足，输出"不足以判断关系性质"
-
-**3d: 当前局势判断**（优先于行动建议）
-基于最近 1 个月的 T1/T2 信号：
-- 当前关系阶段是什么
-- 最近发生了什么关键事件
-- 对方最近的态度/行为信号
-- 趋势判断（升温/稳定/降温）
-- 这是行动卡的直接输入
-- 如果最近缺少 T1/T2，只能输出低置信度观察，不用 T4 补强
-
-**3e: 沟通模式分析**
-参考 `prompts/communication_analyzer.md`：
-- 响应模式（响应时间、消息长度、开启话题）— 基于 T4 统计
-- 情绪表达模式 — 基于 T2 信号
-- 话题模式 — 基于 T3/T4
-- 边界模式 — 基于 T2/T3
-- 非字面表达模式 — 基于 T2/T3
-
-**3f: 人格信号提取（6 层结构）**
-参考 `prompts/persona_analyzer.md`：
-- 基于关系信号台账中的 T1/T2 + 全时段 T3 信号
-- 每条人格结论标注：稳定特征、压力状态、关系特定行为、自我陈述
-- 依恋相关只输出"信号假设"，不输出诊断
-- Layer 0：硬规则（"when X happens, then Y" 行为规则）
-- Layer 1：身份定位（关系角色认知）
-- Layer 2：表达风格（高频词、句式、表情、原话示例）
-- Layer 3：决策模式（压力行为、说"不"方式）
-- Layer 4：关系行为（亲近/疏远/冲突/修复）
-- Layer 5：边界红线（显性/隐性边界）
-- 每个维度必须有标签翻译 + 原话锚定
-
-**3g: 依恋假设分析**
-参考 `prompts/attachment_analyzer.md`：
-- 基于 T2/T3 信号
-- 纳入 T1 自我陈述，但必须同时检查行为反证
-- 对方依恋信号（焦虑/回避/安全）
-- 自我依恋信号
-- 混合模式识别
-
-**3h: 互动模式分析**
-参考 `prompts/interaction_analyzer.md`：
-- 基于全时段 T3 模式
-- 正向循环
-- 负向循环
-- 冲突升级路径
-- 修复信号
-
-**3i: 生成报告**
-参考 `prompts/report_builder.md`，生成报告：
-
-- **Layer -1: 湖镜行动卡（关系行动卡）**（第一屏，仅引用通过审计的 T1/T2/T3 信号）
-- Layer 0.5: 当前局势（最近 T1/T2 信号摘要）
-- Layer 1.5: 关系信号台账摘要
-- Layer 2-3: 双方人格画像（基于全时段 T2/T3 信号）
-- Layer 4: 互动模式（基于 T3 模式）
-- Layer 5: 依恋信号（基于 T2/T3）
-- Layer 6: 沟通建议（基于人格画像 + 当前局势）
-- Layer 7: 不确定性说明
-
-> **Layer 编号速查表**：
-> 
-> | Layer | 名称 | 来源 |
-> |-------|------|------|
-> | -1 | 湖镜行动卡 | T1/T2/T3（通过审计） |
-> | 0 | 核心互动规则 | 人格画像 Layer 0（硬规则） |
-> | 0.5 | 当前局势 | 最近 1 个月 T1/T2 |
-> | 1 | 关系弧线 | T1/T2 时序演变 |
-> | 1.5 | 关系信号台账摘要 | 台账统计 |
-> | 2 | 人格画像·身份定位+表达风格 | 全时段 T2/T3 |
-> | 3 | 人格画像·决策+关系行为+边界 | 全时段 T2/T3 |
-> | 4 | 互动模式 | T3 模式 |
-> | 5 | 依恋信号假设 | T2/T3 |
-> | 6 | 沟通建议 | 人格+局势 |
-> | 7 | 不确定性说明 | 全部分析 |
-
-**3j: 可靠性审计**
-运行 `scripts/relationship_signal_audit.py`（或按其规则手动审计）：
-- T1 是否全部进入主结论
-- 是否存在 T4 覆盖 T1
-- 是否遗漏用户纠正指出的证据
-- 是否出现"就是不喜欢/就是回避型"等单因子断言
-- 人格画像是否包含反证和替代解释
-
-审计未通过时，报告状态必须是"低置信度草案"，行动卡只能输出补充语境和低风险观察。
-
-每个主要结论必须使用固定格式：
-- **观察**: 数据中看到了什么
-- **证据**: E-YYYYMMDD-NNN（必须存在于 evidence_index.jsonl）
-- **推断**: 从观察和证据中推断出什么
-- **置信度**: 高/中/低
-- **反证**: 支持相反结论的证据，或"无强反证"
-- **替代解释**: 至少 1 个其他可能的解释
-- **建议**: 基于此结论的行动建议（如适用）
-
-报告开头必须包含覆盖声明（数据范围、总消息量、抽样说明）。
-
-### Step 3k: 质量自检
-
-生成报告后，执行以下自检：
-
-1. **证据完整性**：每条核心结论是否都有证据 ID、置信度、替代解释
-2. **风险词扫描**：检查是否使用了禁用词（肯定/一定/离不开/吃醋/PUA 等）
-3. **覆盖声明**：大数据分析是否说明了抽样量和时间窗口
-4. **Layer 完整性**：报告是否包含 Layer -1（行动卡）和 Layer 0-7
-5. **关系信号审计**：T1 覆盖、T4 越权、单因子断言、人格画像反证是否通过
-
-如发现违规，修正后再输出。
-
-### Step 4: 教练对话
-
-参考 `prompts/coach_mode.md`：
-
-**开场**：总结 2-3 个发现，问用户想聊什么
-
-```
-我已经分析了你们的聊天记录。数据显示几个值得关注的模式：
-1. {pattern_1}（证据：{IDs}）
-2. {pattern_2}（证据：{IDs}）
-3. {pattern_3}（证据：{IDs}）
-
-你想先聊哪个方面？
-```
-
-**探索**：引用证据 → 置信度 → 替代解释 → 具体建议
-**修正**：用户纠正 → 承认局限 → 更新理解
-**指导**：用户问"我该怎么说" → 多语气草稿 + 推理
-**收尾**：总结 → 未解决的问题 → 后续观察方向
-
-### Step 5: 知识库管理
-
-**首次分析**：生成知识库文件
-- 对方画像（Layer 0-2 结构）
-- 互动模式
-- 依恋信号
-- 不确定性说明
-
-**后续更新**：参考 `prompts/merger.md`
-- 增量合并，不覆盖已有结论
-- 冲突检测，用户决定
-- 版本管理，自动备份
-
-## 进化模式
-
-### 增量合并
-
-当用户提供新数据时：
-1. 分类新信息到对应维度
-2. 检测与已有分析的冲突
-3. 生成 Patch
-4. 展示更新摘要
-5. 用户确认后应用
-
-参考 `prompts/merger.md`。
-
-### 修正处理
-
-当用户纠正分析时：
-1. 理解纠正内容（场景、错误、正确）
-2. 判断归属（哪个 Layer）
-3. 生成 Correction 记录
-4. 检查冲突
-5. 确认并写入
-
-参考 `prompts/correction_handler.md`。
-
-## 输出要求
-
-### 必须输出
-1. **湖镜行动卡（关系行动卡）**（Layer -1，报告第一屏，1 分钟内回答"我现在该怎么做"）
-2. 关系分析报告（Layer 0-7 完整结构）
-3. 不确定性说明（每个结论的置信度、反证、替代解释）
-4. 关系信号台账摘要与可靠性审计状态
-
-### 可选输出（根据用户需求）
-3. 沟通教练（多语气回复）
-4. 消息草稿（温和版/直接版/降压版/有边界版）
-5. 知识库文件或 Patch
-
-### 语言规范
-
-使用：
-> 聊天记录呈现某些……信号。该判断置信度为……。替代解释包括……。
-
-禁止：
-> 对方就是……型。
-> 对方一定……。
-> 这能制造依赖或控制对方。
-
-## 框架文件引用
-
-分析时参考以下框架：
-
-- `references/frameworks/evidence_ladder.md` — 证据等级定义
-- `references/frameworks/big_five_communication_signals.md` — 大五人格沟通信号
-- `references/frameworks/attachment_anxiety_avoidance.md` — 依恋焦虑/回避信号
-- `references/frameworks/relationship_communication_patterns.md` — 关系互动模式
-- `references/frameworks/forbidden_overclaims.md` — 禁止的过度断言
-- `references/frameworks/symbolic_mode_policy.md` — 星座/塔罗策略
-- `references/frameworks/coaching_dialogue_framework.md` — 教练对话框架
-
-## 禁止事项
-
-### 绝对禁止
-- 诊断人格类型或心理健康状态
-- 提供操控、PUA、情感勒索建议
-- 使用确定性语言（"他一定是..."、"他肯定..."）
-- 预测关系结局
-- 建议冷暴力、嫉妒诱导、消失测试
-
-### 安全替代
-| 禁忌表达 | 安全替代 |
-|---------|---------|
-| "他是回避型人格" | "聊天记录呈现一些回避相关信号" |
-| "他一定不爱你" | "数据显示 {pattern}，但可能有其他解释" |
-| "用冷落来测试他" | "建议直接沟通你的感受和需求" |
-| "让他吃醋" | "建议通过正面方式表达你的价值" |
-
-## 用户纠正的价值
-
-用户纠正是系统最重要的学习信号之一：
-
-1. **不要防御**：不要试图证明分析是对的
-2. **优先用户判断**：用户比数据更了解对方
-3. **询问细节**：用户的纠正可能包含重要上下文
-4. **更新理解**：将纠正整合到知识库
-5. **降低置信度**：如果用户纠正了关键观察，相关假设的置信度应降低
+始终按以下顺序工作：
+
+1. 读取数据覆盖、隐私模式与质量说明。
+2. 读取 relationship_signal_candidates.jsonl。
+3. 结合完整上下文逐条写 relationship_signal_decisions.jsonl。
+4. 运行 lake-skill signals-finalize。
+5. 以 relationship_analysis.json 为唯一事实源。
+6. 先输出关系讨论，再输出行动卡、画像和互动统计。
+
+候选置信度不是关系结论。禁止在候选阶段自动 confirmed。
+
+## 语义决策
+
+每个候选必须有且只有一个决定：
+
+- confirmed：上下文支持该事件解释。
+- downgraded：相关但质量、主体或语义不足。
+- excluded：歌词、引用、第三方故事、OCR/ASR 错误或其他假阳性。
+
+决策必须包含 event_id、decision、tier、decision_reason、consensus_state、boundary_effect、conditions、counterevidence_ids、must_not_infer。
+
+confirmed 或 downgraded 必须使用 T1–T4；excluded 必须 tier 为 null。排除项也必须保留在正式 ledger，禁止静默遗漏。
+
+详细字段见 schemas/relationship_signal_decision.schema.json。
+
+## 证据优先级
+
+- T1：双方关于关系定义、拒绝、暂停、条件、边界、承诺、分手、复合和修复的明确原话。
+- T2：跨 session 的稳定互动模式与兑现情况。
+- T3：单一 session 的情境性行为。
+- T4：消息量、回复时间、长度、发起比例等描述统计。
+
+T1 永远高于 T4。回复快、消息多、继续日常聊天，都不能推翻明确拒绝或边界。
+
+## 事件确认规则
+
+确认事件时必须同时检查触发原话、说话人、同一 session 前 2 条和后 4 条、对方即时回应、双方定义、条件、时间点、责任主体、后续 3 个 session 或 14 天内跟进、改口、兑现、撤回和反证。
+
+同时检查否定范围、歌词、转述、第三方故事与低质量 OCR/ASR。
+
+“不是不喜欢你，只是不想现在开始”不得压成单纯接受或拒绝。
+“我朋友要结婚了”不得升级为双方未来承诺。
+“不合适”不得解释为等待挽留。
+
+## 报告路由硬约束
+
+报告顺序固定：
+
+1. 关键关系讨论。
+2. 已有共识。
+3. 分歧与开放条件。
+4. 最近改口或阶段变化。
+5. 能判断与不能判断。
+6. 本周行动、避免事项和消息草稿。
+7. 双方画像、互动模式和依恋假设。
+8. 不确定性与反证。
+
+- 有明确拒绝：禁止从日常热情推断“其实喜欢”。
+- 有条件性接受：同时保留开放条件和现实限制。
+- 定义不一致：优先澄清或降压，不直接推进。
+- 有明确边界：全部消息草稿先通过边界检查。
+- 没有关系讨论：明确写“关系性质不足以判断”。
+
+## 一分钟行动卡
+
+默认只输出双方原话、当前共识和分歧、本周一个主策略、最多三个动作、不要做什么、一条通过边界检查的消息、判断边界与关键 evidence ID。
+
+先给结论，再给依据。表达直接、简短、温和。
+
+## 双方画像
+
+画像分六层，并引用 evidence ID 或已确认关系事件：
+
+1. 自我陈述。
+2. 关系特定行为。
+3. 压力状态。
+4. 跨情境稳定特征。
+5. 互动触发与修复。
+6. 替代解释和反证。
+
+必须区分稳定特征、压力状态、关系特定行为与自我陈述。依恋风格只能是可证伪假设，不作临床诊断。
+
+## 消息草稿边界检查
+
+检查草稿是否违反拒绝、暂停、空间或频率边界；是否包含施压、内疚、嫉妒诱导、冷落测试或操控；是否把推断当事实；是否允许真实拒绝与不回复。
+
+不通过时解释原因并给低压版本。
+
+## 隐私与安全
+
+区分本地预处理、脱敏后上传分析、本地模型全程处理。只有第三种可称“全程本地”。
+
+不得默认要求上传原始数据库，不提供微信数据库解密，不分析未经授权的第三方隐私材料。公开演示只使用合成数据。
+
+拒绝操控、监控、报复、跟踪、胁迫或未成年人亲密推进建议。遇到自伤、暴力、跟踪或现实安全风险，优先现实支持和专业帮助。
+
+## 资源读取
+
+- 字段定义读取 schemas/。
+- 证据等级和禁止过度推断读取 references/frameworks/evidence_ladder.md 与 forbidden_overclaims.md。
+- 分析提示词读取 prompts/safety_notice.md、relationship_signal_extractor.md、signal_weighting.md 与 report_builder.md。
+- 知识库结构复制 assets/kb_template/，不要修改模板原件。
+
+## 完成审计
+
+- 候选决策完整率 100%。
+- 每条正式 T1 至少进入摘要、时间线或行动卡之一。
+- 明确边界没有被 T4 覆盖。
+- Markdown 与 HTML 来自同一 relationship_analysis.json。
+- 不输出爱情总分、真爱概率、舔狗指数或临床诊断。
+- 结论包含证据、替代解释和不能判断项。

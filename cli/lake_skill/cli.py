@@ -419,8 +419,107 @@ def evidence(
     save_evidence_index(evidence_list, str(output_path))
     rprint(f"[green]Saved evidence index -> {output_path}[/green]")
 
+@app.command()
+def signals(
+    messages_file: str = typer.Option(..., "--messages", "-m", help="Messages JSONL file"),
+    sessions_file: str = typer.Option(..., "--sessions", "-s", help="Sessions JSONL file"),
+    evidence_file: str = typer.Option(..., "--evidence", "-e", help="Evidence JSONL file"),
+    out: str = typer.Option(".", "--out", "-o", help="Output directory"),
+) -> None:
+    """Extract high-recall candidates; semantic conclusions are intentionally deferred."""
+    from .jsonl_utils import read_jsonl
+    from .relationship_signals import (
+        extract_relationship_signal_candidates,
+        save_relationship_signal_candidates,
+    )
+    from .schema import Evidence, Message, Session
+
+    paths = {
+        "Messages": Path(messages_file),
+        "Sessions": Path(sessions_file),
+        "Evidence": Path(evidence_file),
+    }
+    for label, path in paths.items():
+        if not path.exists():
+            rprint(f"[red]Error: {label} file not found: {path}[/red]")
+            raise typer.Exit(1)
+
+    output_dir = Path(out)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    messages = [Message(**data) for data in read_jsonl(paths["Messages"])]
+    sessions_list = [Session(**data) for data in read_jsonl(paths["Sessions"])]
+    evidence_list = [Evidence(**data) for data in read_jsonl(paths["Evidence"])]
+
+    candidates = extract_relationship_signal_candidates(messages, sessions_list, evidence_list)
+    candidate_path = output_dir / "relationship_signal_candidates.jsonl"
+    save_relationship_signal_candidates(candidates, candidate_path)
+
+    rprint(f"[green]Extracted {len(candidates)} pending relationship events.[/green]")
+    rprint(f"  Candidates: {candidate_path}")
+    rprint("  Next: write relationship_signal_decisions.jsonl, then run signals-finalize.")
+
 
 # KB subcommand group
+
+
+@app.command("signals-finalize")
+def signals_finalize(
+    candidates_file: str = typer.Option(..., "--candidates", help="Candidate JSONL file"),
+    decisions_file: str = typer.Option(..., "--decisions", help="Skill decision JSONL file"),
+    stats_file: Optional[str] = typer.Option(None, "--stats", help="Optional interaction_stats.json"),
+    out: str = typer.Option(".", "--out", "-o", help="Output directory"),
+) -> None:
+    """Audit Skill decisions, retain exclusions, and generate the formal ledger and reports."""
+    import json
+
+    from .jsonl_utils import read_jsonl
+    from .relationship_signals import (
+        finalize_relationship_signals,
+        render_relationship_discussion_summary,
+        save_relationship_signal_ledger,
+    )
+    from .reports.analysis import (
+        build_relationship_analysis,
+        render_analysis_html,
+        render_analysis_markdown,
+        write_relationship_analysis,
+    )
+    from .schema import RelationshipSignalCandidate, RelationshipSignalDecision
+
+    candidate_path = Path(candidates_file)
+    decision_path = Path(decisions_file)
+    if not candidate_path.exists() or not decision_path.exists():
+        rprint("[red]Error: candidates and decisions files are both required.[/red]")
+        raise typer.Exit(1)
+    output_dir = Path(out)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    candidates = [RelationshipSignalCandidate(**item) for item in read_jsonl(candidate_path)]
+    decisions = [RelationshipSignalDecision(**item) for item in read_jsonl(decision_path)]
+    try:
+        ledger = finalize_relationship_signals(candidates, decisions)
+    except ValueError as exc:
+        rprint(f"[red]Finalize audit failed: {exc}[/red]")
+        raise typer.Exit(1) from exc
+    stats = {}
+    if stats_file and Path(stats_file).exists():
+        stats = json.loads(Path(stats_file).read_text(encoding="utf-8"))
+    save_relationship_signal_ledger(ledger, output_dir / "relationship_signal_ledger.jsonl")
+    (output_dir / "relationship_signal_decisions.jsonl").write_text(
+        decision_path.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    (output_dir / "relationship_discussion_summary.md").write_text(
+        render_relationship_discussion_summary(ledger), encoding="utf-8"
+    )
+    analysis = build_relationship_analysis(ledger=ledger, interaction_stats=stats, mode="deep")
+    write_relationship_analysis(output_dir / "relationship_analysis.json", analysis)
+    (output_dir / "relationship_analysis.md").write_text(
+        render_analysis_markdown(analysis), encoding="utf-8"
+    )
+    (output_dir / "relationship_analysis.html").write_text(
+        render_analysis_html(analysis), encoding="utf-8"
+    )
+    rprint(f"[green]Finalized {len(ledger)} audited events -> {output_dir}[/green]")
+
 kb_app = typer.Typer(help="Knowledge base management commands.")
 app.add_typer(kb_app, name="kb")
 
@@ -793,6 +892,8 @@ def process(
     skip_doctor: bool = typer.Option(False, "--skip-doctor", help="Skip data readiness check"),
 ) -> None:
     """Run full pipeline: ingest → redact → segment → digest → evidence → intake → doctor → export → bundle."""
+    import json
+
     from .adapters.generic_csv import GenericCSVAdapter
     from .adapters.generic_jsonl import GenericJSONLAdapter
     from .adapters.wechat_txt import WeChatTXTAdapter
@@ -805,6 +906,18 @@ def process(
     from .segmentation.sessionizer import segment_sessions
     from .reports.digest import generate_digest
     from .evidence.indexer import index_evidence, save_evidence_index
+    from .relationship_signals import (
+        extract_relationship_signal_candidates,
+        save_relationship_signal_candidates,
+    )
+    from .interaction_stats import compute_interaction_stats
+    from .analysis_windows import build_analysis_windows
+    from .reports.analysis import (
+        build_relationship_analysis,
+        render_analysis_html,
+        render_analysis_markdown,
+        write_relationship_analysis,
+    )
     from .doctor_checks import run_doctor_checks, format_readiness_report
     from .intake_io import save_intake_yaml, save_intake_md
     from .schema import IntakeCard, WorkMode
@@ -824,7 +937,7 @@ def process(
     rprint()
 
     # Step 1: Ingest
-    rprint("[bold]Step 1/8: Ingest[/bold]")
+    rprint("[bold]Step 1/9: Ingest[/bold]")
     suffix = file_path.suffix.lower()
     if suffix == ".csv":
         adapter = GenericCSVAdapter(warnings_path=out_dir / "parse_warnings.jsonl", self_name=self_name, target_name=target_name)
@@ -842,66 +955,93 @@ def process(
 
     raw_path = out_dir / "raw_messages.jsonl"
     count = adapter.process(file_path, raw_path)
-    rprint(f"  [green]✓[/green] {count} messages ingested")
+    rprint(f"  [green]OK[/green] {count} messages ingested")
 
     # Step 2: Redact
-    rprint("[bold]Step 2/8: Redact[/bold]")
+    rprint("[bold]Step 2/9: Redact[/bold]")
     mode = validate_privacy_mode(privacy_mode)
     redactor = create_redactor(mode)
     messages_data = list(read_jsonl(raw_path))
     redacted_messages = [redactor.redact_message(msg) for msg in messages_data]
     redacted_path = out_dir / "redacted_messages.jsonl"
     write_jsonl(redacted_path, redacted_messages)
-    rprint(f"  [green]✓[/green] {len(redacted_messages)} messages redacted ({privacy_mode})")
+    rprint(f"  [green]OK[/green] {len(redacted_messages)} messages redacted ({privacy_mode})")
 
     # Step 3: Segment
-    rprint("[bold]Step 3/8: Segment[/bold]")
+    rprint("[bold]Step 3/9: Segment[/bold]")
     messages = [Message(**data) for data in read_jsonl(redacted_path)]
     sessions = segment_sessions(messages, time_gap_hours=time_gap)
     sessions_path = out_dir / "sessions.jsonl"
     write_jsonl_models(sessions_path, sessions)
-    rprint(f"  [green]✓[/green] {len(sessions)} sessions created")
+    rprint(f"  [green]OK[/green] {len(sessions)} sessions created")
 
     # Step 4: Digest
-    rprint("[bold]Step 4/8: Digest[/bold]")
+    rprint("[bold]Step 4/9: Digest[/bold]")
     digest_path = out_dir / "digest.md"
     generate_digest(messages, sessions, str(digest_path))
-    rprint("  [green]✓[/green] Digest generated")
+    rprint("  [green]OK[/green] Digest generated")
 
     # Step 5: Evidence
-    rprint("[bold]Step 5/8: Evidence[/bold]")
+    rprint("[bold]Step 5/9: Evidence[/bold]")
     evidence_list = index_evidence(messages, sessions)
     evidence_path = out_dir / "evidence_index.jsonl"
     save_evidence_index(evidence_list, str(evidence_path))
-    rprint(f"  [green]✓[/green] {len(evidence_list)} evidence items indexed")
+    rprint(f"  [green]OK[/green] {len(evidence_list)} evidence items indexed")
+    # Step 6: Relationship signals
+    rprint("[bold]Step 6/9: Relationship signals[/bold]")
+    signal_candidates = extract_relationship_signal_candidates(messages, sessions, evidence_list)
+    candidate_path = out_dir / "relationship_signal_candidates.jsonl"
+    relationship_summary_path = out_dir / "relationship_discussion_summary.md"
+    save_relationship_signal_candidates(signal_candidates, candidate_path)
+    relationship_summary_path.write_text(
+        "# 关系讨论摘要\n\n> 候选事件正在等待 Skill 语义审核，当前不生成正式关系结论。\n",
+        encoding="utf-8",
+    )
+    interaction_stats = compute_interaction_stats(messages, sessions)
+    (out_dir / "interaction_stats.json").write_text(
+        json.dumps(interaction_stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    analysis_windows = build_analysis_windows(messages, sessions, signal_candidates)
+    write_jsonl(out_dir / "analysis_windows.jsonl", analysis_windows)
+    analysis = build_relationship_analysis(
+        candidates=signal_candidates, interaction_stats=interaction_stats, mode="quick"
+    )
+    write_relationship_analysis(out_dir / "relationship_analysis.json", analysis)
+    (out_dir / "relationship_analysis.md").write_text(
+        render_analysis_markdown(analysis), encoding="utf-8"
+    )
+    (out_dir / "relationship_analysis.html").write_text(
+        render_analysis_html(analysis), encoding="utf-8"
+    )
+    rprint(f"  [green]OK[/green] {len(signal_candidates)} events pending semantic review")
 
-    # Step 6: Intake
-    rprint("[bold]Step 6/8: Intake[/bold]")
+    # Step 7: Intake
+    rprint("[bold]Step 7/9: Intake[/bold]")
     card = IntakeCard(
         privacy_mode=privacy_mode,
-        work_mode=WorkMode.auto,
+        work_mode=WorkMode.AUTO,
         self_name=self_name or "",
         target_name=target_name or "",
     )
     save_intake_yaml(card, out_dir / "lakeskill_intake.yaml")
     save_intake_md(card, out_dir / "lakeskill_intake.md")
-    rprint("  [green]✓[/green] Intake files generated")
+    rprint("  [green]OK[/green] Intake files generated")
 
-    # Step 7: Doctor
+    # Step 8: Doctor
     if not skip_doctor:
-        rprint("[bold]Step 7/8: Doctor[/bold]")
+        rprint("[bold]Step 8/9: Doctor[/bold]")
         results = run_doctor_checks(messages, sessions)
         report_content = format_readiness_report(results)
         (out_dir / "data_readiness.md").write_text(report_content, encoding="utf-8")
         for check in results["checks"]:
-            icon = "[green]✓[/green]" if check["passed"] else "[yellow]![/yellow]"
+            icon = "[green]OK[/green]" if check["passed"] else "[yellow]![/yellow]"
             rprint(f"  {icon} {check['name']}: {check['summary']}")
         rprint(f"  Overall: [bold]{results['overall']}[/bold]")
     else:
-        rprint("[bold]Step 7/8: Doctor[/bold] [dim](skipped)[/dim]")
+        rprint("[bold]Step 8/9: Doctor[/bold] [dim](skipped)[/dim]")
 
-    # Step 8: Export
-    rprint("[bold]Step 8/8: Export[/bold]")
+    # Step 9: Export
+    rprint("[bold]Step 9/9: Export[/bold]")
     export_path = out_dir / "export.jsonl"
     msg_lookup = {m.message_id: m for m in messages}
     import json
@@ -933,7 +1073,7 @@ def process(
                 "messages": session_messages,
             }
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    rprint(f"  [green]✓[/green] Exported {len(sessions)} conversations ({export_mode})")
+    rprint(f"  [green]OK[/green] Exported {len(sessions)} conversations ({export_mode})")
 
     # Bundle
     if not skip_bundle:
@@ -941,7 +1081,7 @@ def process(
         rprint("[bold]Creating upload bundle...[/bold]")
         try:
             copied = bundle_upload_artifacts(out_dir, out_dir / "upload_bundle")
-            rprint(f"  [green]✓[/green] Bundle created with {len(copied)} files")
+            rprint(f"  [green]OK[/green] Bundle created with {len(copied)} files")
         except Exception as e:
             rprint(f"  [yellow]![/yellow] Bundle creation failed: {e}")
 
@@ -952,10 +1092,73 @@ def process(
     rprint("  Key files:")
     rprint(f"    {out_dir / 'digest.md'}")
     rprint(f"    {out_dir / 'evidence_index.jsonl'}")
+    rprint(f"    {out_dir / 'relationship_signal_candidates.jsonl'}")
+    rprint(f"    {out_dir / 'relationship_discussion_summary.md'}")
+    rprint(f"    {out_dir / 'relationship_analysis.html'}")
+    rprint(f"    {out_dir / 'interaction_stats.json'}")
     rprint(f"    {out_dir / 'export.jsonl'}")
     if not skip_bundle:
         rprint(f"    {out_dir / 'upload_bundle'}")
 
+
+@app.command()
+def start(
+    file: Optional[str] = typer.Option(None, "--file", "-f", help="Exported chat file"),
+    target_name: Optional[str] = typer.Option(None, "--target-name", help="Contact display name"),
+    self_name: Optional[str] = typer.Option(None, "--self-name", help="Your display name"),
+    privacy_mode: Optional[str] = typer.Option(None, "--privacy-mode", help="local-raw, local-safe, cloud-safe"),
+    mode: Optional[str] = typer.Option(None, "--mode", help="quick or deep"),
+    workspace_root: str = typer.Option("work", "--workspace-root", help="Workspace root"),
+) -> None:
+    """Guided first run with an isolated contact workspace."""
+    from .jsonl_utils import read_jsonl
+    from .workspace import contact_workspace, write_workspace_state
+
+    selected_file = file or typer.prompt("聊天导出文件路径")
+    selected_target = target_name or typer.prompt("联系人显示名")
+    selected_privacy = privacy_mode or typer.prompt(
+        "隐私模式 (local-safe/cloud-safe/local-raw)", default="cloud-safe"
+    )
+    selected_mode = mode or typer.prompt("报告模式 (quick/deep)", default="quick")
+    if selected_mode not in {"quick", "deep"}:
+        rprint("[red]Error: mode must be quick or deep.[/red]")
+        raise typer.Exit(1)
+    source = Path(selected_file)
+    workspace = contact_workspace(Path(workspace_root), selected_target)
+    process(
+        file=str(source),
+        out=str(workspace),
+        privacy_mode=selected_privacy,
+        self_name=self_name,
+        target_name=selected_target,
+        time_gap=6.0,
+        export_mode="conversations",
+        skip_bundle=False,
+        skip_doctor=False,
+    )
+    redacted = workspace / "redacted_messages.jsonl"
+    count = sum(1 for _ in read_jsonl(redacted)) if redacted.exists() else None
+    write_workspace_state(
+        workspace,
+        source=source,
+        mode=selected_mode,
+        privacy_mode=selected_privacy,
+        message_count=count,
+    )
+    rprint(f"[bold green]Contact workspace ready:[/bold green] {workspace.resolve()}")
+    rprint(f"  Open report: {(workspace / 'relationship_analysis.html').resolve()}")
+
+
+@app.command()
+def route(text: str = typer.Argument(..., help="Text alias such as /急 or /深度")) -> None:
+    """Resolve cross-platform LakeSkill text routes."""
+    from .workspace import resolve_text_route
+
+    resolved = resolve_text_route(text)
+    if resolved == "unknown":
+        rprint("[yellow]Unknown route. Supported: /急 /深度 /画像 /复盘 /更新 /改写[/yellow]")
+        raise typer.Exit(1)
+    rprint(resolved)
 
 @app.command()
 def doctor(

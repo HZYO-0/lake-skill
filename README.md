@@ -2,7 +2,7 @@
 
 > *"我之前一直问 AI 'TA 到底喜不喜欢我'，它每次都给一个很肯定的答案，但我越看越焦虑。用了 LakeSkill 才发现，原来它应该先告诉我'证据不够'。"*
 
-**别让 AI 猜 TA 爱不爱你。让聊天证据自己说话。**
+**别让 AI 猜 TA 爱不爱你。先把双方真正说过的话找全，再判断下一步怎么做。**
 
 [![CI](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/ci.yml)
 [![Security](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml/badge.svg)](https://github.com/HZYO-0/lake-skill/actions/workflows/security.yml)
@@ -14,6 +14,36 @@
 [English](README_EN.md) | [安装指南](INSTALL.md) | [快速开始](docs/quickstart.md) | [聊天记录准备](docs/chat_record_preparation.md) | [FAQ](docs/FAQ.md)
 
 粘贴一段聊天记录，LakeSkill 会：
+
+## 30 秒看懂
+
+LakeSkill 0.12 把分析链路固定为：
+
+原始聊天 → 全量候选 → Skill 语义决策 → 正式台账 → 统一分析 JSON → Markdown / 本地 HTML
+
+    pip install lake-skill
+    lake-skill demo --out examples/social_demo
+    lake-skill start
+
+Demo 会生成四套纯合成案例：条件性接受、明确拒绝后继续日常聊天、双方定义不一致、分手后重新讨论。
+
+## 为什么和普通恋爱分析不同
+
+| 维度 | LakeSkill | 常见恋爱分析 Skill |
+|---|---|---|
+| 关系讨论全量扫描 | 是 | 常依赖采样或 prompt |
+| 候选与结论分离 | 是 | 通常没有 |
+| 明确边界优先 | 是 | 可能被重新解释 |
+| 证据 ID / 反证 | 强制 | 不稳定 |
+| 导入与视觉报告 | 持续完善 | 部分项目更成熟 |
+
+LakeSkill 不输出“被爱指数”“舔狗指数”或爱情总分。回复时间、消息比例和长度只作为 T4 描述背景；关系定义、拒绝、条件和边界始终优先。
+
+## 隐私边界
+
+- **本地预处理**：原始聊天在本地整理。
+- **脱敏后上传分析**：只有脱敏产物进入云端模型。
+- **本地模型全程处理**：只有这种模式可以称“全程本地”。
 
 - 告诉你**证据支持什么**，不支持什么——不靠猜
 - 给你一张**行动卡**：本周该做什么、不要做什么、可以怎么说
